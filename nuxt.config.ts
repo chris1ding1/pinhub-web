@@ -14,4 +14,10 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'en',
   },
+  runtimeConfig: {
+    public: {
+      appName: process.env.NUXT_PUBLIC_APP_NAME,
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+    }
+  },
 })
