@@ -22,22 +22,8 @@ export interface Pin {
 
 
 export const usePins = () => {
-  const config = useRuntimeConfig()
-  const apiBase = config.public.apiBase as string
-
-  const usersPinsIndex = (page: number = 1, search: string = '') => {
-    return useFetch('users/281nba/pins/', {
-      baseURL: apiBase,
-      query: {
-        page,
-        search,
-      }
-    })
-  }
-
-  const pinsIndex = (page: number = 1, search: string = '') => {
-    return useFetch('pins/', {
-      baseURL: apiBase,
+  const userPinsIndex = (page: number = 1, search: string = '') => {
+    return useAPI('/users/pins', {
       query: {
         page,
         search,
@@ -46,31 +32,27 @@ export const usePins = () => {
   }
 
   const pinsStore = (pinData) => {
-    return useFetch('pins/', {
-      baseURL: apiBase,
+    return useAPI('/pins', {
       method: 'POST',
       body: pinData,
     })
   }
 
-  const pinsUpdate = (uid, pinData) => {
-    return useFetch(`pins/${uid}`, {
-      baseURL: apiBase,
+  const pinsUpdate = (id: string, pinData) => {
+    return useAPI(`/pins/${id}`, {
       method: 'PUT',
       body: pinData,
     })
   }
 
-  const pinsDestroy = (uid) => {
-    return useFetch(`pins/${uid}`, {
-      baseURL: apiBase,
+  const pinsDestroy = (id: string) => {
+    return useAPI(`/pins/${id}`, {
       method: 'DELETE',
     })
   }
 
   return {
-    usersPinsIndex,
-    pinsIndex,
+    userPinsIndex,
     pinsStore,
     pinsUpdate,
     pinsDestroy,

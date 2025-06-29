@@ -6,33 +6,37 @@
       </h1>
     </header>
     <main>
-        <ul v-if="pins?.items?.length" role="list" class="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
-            <li v-for="pin in pins.items" :key="pin.uid">
+        <ul v-if="userPins?.items?.length" role="list" class="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
+            <li v-for="pin in userPins.data.items" :key="pin.id">
                 {{ pin.content }}
                 {{ pin.image_url }}
                 {{ pin.audio_url }}
-                {{ pin.uid }}
-                <a :href="pin.url" rel="UGC nofollow noopener noreferrer">{{ pin.url }}</a>
+                {{ pin.id }}
+                <a :href="pin.url" rel="nofollow noopener">{{ pin.url }}</a>
             </li>
         </ul>
     </main>
   </div>
 </template>
 <script setup lang="ts">
-const { usersPinsIndex } = usePins()
+const { loggedIn } = useUserSession()
+
 const config = useRuntimeConfig()
 const title = config.public.appName
 
-const page = ref(1)
-const search = ref("")
-/*
-const { data: pins, refresh } = await usersPinsIndex(page.value, search.value)
-console.log('rrr: ',pins.value)
+const userPins = ref({})
+const { userPinsIndex } = usePins()
+const pinsParamPage = ref(1)
+const pinsParamSearch = ref("")
 
-const pinsIndexMore = async () => {
-  page.value++
-  await refresh()
-}
-pinsIndexMore()
-*/
+watch(loggedIn, async (newLoggedIn, oldLoggedIn) => {
+  if (newLoggedIn) {
+    userPins.value = await userPinsIndex(1, '', {
+      server: false,
+      lazy: true
+    })
+  } else {
+    userPins.value = null
+  }
+}, { immediate: true })
 </script>
