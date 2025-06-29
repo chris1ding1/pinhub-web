@@ -2,7 +2,7 @@
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <img class="mx-auto h-10 w-auto" src="/favicon.svg" :alt="config.public.appName" />
+      <a href="/"><img class="mx-auto h-10 w-auto" src="/favicon.svg" :alt="config.public.appName" /></a>
       <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Login in to your account</h2>
     </div>
 
@@ -71,7 +71,11 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 
-const { fetch: refreshSession } = useUserSession()
+const { loggedIn, fetch: refreshSession } = useUserSession()
+
+if (loggedIn.value) {
+  await navigateTo('/')
+}
 
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase as string
