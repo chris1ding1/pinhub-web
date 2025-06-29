@@ -1,19 +1,69 @@
 <template>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <form method="POST">
-      <input v-model="authEmailCodeForm.email" type="email" name="email" placeholder="Email" required maxlength="255">
-      <input v-model="authEmailCodeForm.verifyCode" type="text" name="verify-code" placeholder="Verify Code" required maxlength="6">
-      <button type="button" @click="handleAuthEmailSend">Send Code</button>
-      <button type="button" @click="handleLoginFormSubmit">Login</button>
-    </form>
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <img class="mx-auto h-10 w-auto" src="/favicon.svg" :alt="config.public.appName" />
+      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Login in to your account</h2>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <form class="space-y-6" method="POST">
+        <div v-if="errorMsg">
+            <p class="mt-2 text-sm text-red-600">
+                {{ errorMsg }}
+            </p>
+        </div>
+        <div>
+          <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+          <div class="mt-2">
+            <input v-model="authEmailCodeForm.email" type="email" name="email" id="email" autocomplete="email" required maxlength="255" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+            <p v-if="errorsFrom.email" class="mt-2 text-sm text-red-600" id="email-error">{{ errorsFrom.email }}</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="verify-code" class="block text-sm/6 font-medium text-gray-900">Verify Code</label>
+            <div class="text-sm">
+              <button
+                @click="handleAuthEmailSend"
+                type="button"
+                :disabled="isSendCodeDisabled"
+                :class="[
+                  'font-semibold',
+                  isSendCodeDisabled
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-indigo-600 hover:text-indigo-500'
+                ]"
+              >
+                Send verify code
+              </button>
+            </div>
+          </div>
+          <div class="mt-2">
+            <input v-model="authEmailCodeForm.verifyCode" type="text" name="verify-code" id="verify-code" autocomplete="current-password" required maxlength="6" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+            <p v-if="errorsFrom.verifyCode" class="mt-2 text-sm text-red-600" id="verify-code-error">{{ errorsFrom.verifyCode }}</p>
+          </div>
+        </div>
+
+        <div>
+          <button type="button" @click="handleLoginFormSubmit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login in</button>
+        </div>
+      </form>
+      <p class="mt-10 text-center text-sm/6 text-gray-500">
+        Continue with email. (No account? We'll create one.)
+      </p>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import * as v from 'valibot';
 
+
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase as string
 
+const errorMsg = ref('')
 
 const authEmailCodeForm = reactive({
   email: '',
@@ -41,41 +91,121 @@ const AuthEmailCodeSchema = v.object({
   verifyCode: verifyCodeValidation
 })
 
+const errorsFrom = ref({
+  email: '',
+  verifyCode: '',
+})
+
+const isSendCodeDisabled = ref(false)
+const sendCodeCountdown = ref(0)
+let sendCodeCountdownTimer: NodeJS.Timeout | null = null
+const startCountdown = () => {
+  sendCodeCountdown.value = 60
+  isSendCodeDisabled.value = true
+
+  sendCodeCountdownTimer = setInterval(() => {
+    sendCodeCountdown.value--
+    if (sendCodeCountdown.value <= 0) {
+      clearInterval(sendCodeCountdownTimer!)
+      sendCodeCountdownTimer = null
+      isSendCodeDisabled.value = false
+    }
+  }, 1000)
+}
+
+const clearFormErrors = () => {
+  errorsFrom.value = {
+    email: '',
+    verifyCode: '',
+  }
+}
+
 type SendAuthEmailCodeData = v.InferOutput<typeof SendAuthEmailCodeSchema>
 type AuthEmailCodeData = v.InferOutput<typeof AuthEmailCodeSchema>
 
 async function handleAuthEmailSend() {
-  try {
-    const validatedData = v.parse(SendAuthEmailCodeSchema, {
-      email: authEmailCodeForm.email
-    })
+  clearFormErrors()
+  errorMsg.value = ''
 
+  let validatedData: SendAuthEmailCodeData
+
+  try {
+    validatedData = v.parse(SendAuthEmailCodeSchema,
+      {
+        email: authEmailCodeForm.email
+      }
+    )
+  } catch (error) {
+    if (error instanceof v.ValiError) {
+      const emailError = error.issues.find(issue => issue.path?.[0].key === 'email');
+      if (emailError) {
+        errorsFrom.value.email = emailError.message;
+      }
+    }
+    return
+  }
+
+  startCountdown()
+
+  try {
     const res = await $fetch('auth/email/send', {
       baseURL: apiBase,
       method: 'POST',
       body: validatedData
     })
-    console.log(res)
+
+    if (res?.code !== 0) {
+      errorMsg.value = 'Error.'
+    }
   } catch (error) {
-    console.log(error);
+    errorMsg.value = 'Network error or server error.'
   }
 }
 
 async function handleLoginFormSubmit() {
+  clearFormErrors()
+  errorMsg.value = ''
+
+  let validatedData: AuthEmailCodeData
+
   try {
-    const validatedData = v.parse(AuthEmailCodeSchema, {
+    validatedData = v.parse(AuthEmailCodeSchema, {
       email: authEmailCodeForm.email,
       verifyCode: authEmailCodeForm.verifyCode
     })
+  } catch (error) {
+    if (error instanceof v.ValiError) {
+      const emailError = error.issues.find(issue => issue.path?.[0].key === 'email');
+      if (emailError) {
+        errorsFrom.value.email = emailError.message;
+      }
+      const verifyCodeError = error.issues.find(issue => issue.path?.[0].key === 'verifyCode');
+      if (verifyCodeError) {
+        errorsFrom.value.verifyCode = verifyCodeError.message;
+      }
+    }
+    return
+  }
 
+  try {
     const res = await $fetch('auth/email/verify', {
       baseURL: apiBase,
       method: 'POST',
       body: validatedData
     })
-    console.log(res)
+    console.log('res: ',res)
+    if (res?.code !== 0) {
+      errorMsg.value = 'Error.'
+    }
   } catch (error) {
-    console.log(error);
+    errorMsg.value = 'Network error or server error.'
   }
 }
+
+onUnmounted(() => {
+  if (sendCodeCountdownTimer) {
+    clearInterval(sendCodeCountdownTimer)
+    sendCodeCountdownTimer = null
+  }
+})
 </script>
