@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 
-const { loggedIn, user, fetch: refreshSession } = useUserSession()
+const { fetch: refreshSession } = useUserSession()
 
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase as string
@@ -138,7 +138,7 @@ type SendAuthEmailCodeData = v.InferOutput<typeof SendAuthEmailCodeSchema>
 type AuthEmailCodeData = v.InferOutput<typeof AuthEmailCodeSchema>
 
 async function handleAuthEmailSend() {
-  isLoginLoading.value = true
+  isSendCodeDisabled.value = true
   clearFormErrors()
   errorMsg.value = ''
 
@@ -200,6 +200,7 @@ async function handleLoginFormSubmit() {
         errorsFrom.value.verifyCode = verifyCodeError.message;
       }
     }
+    isLoginLoading.value = false
     return
   }
 
