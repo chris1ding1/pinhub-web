@@ -47,7 +47,19 @@
         </div>
 
         <div>
-          <button type="button" @click="handleLoginFormSubmit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login in</button>
+          <button
+            type="button"
+            :disabled="isLoginLoading"
+            @click="handleLoginFormSubmit"
+            :class="[
+              'flex w-full justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+              isLoginLoading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-500'
+            ]"
+          >
+            {{ isLoginLoading ? 'Loading...' : 'Login in' }}
+          </button>
         </div>
       </form>
       <p class="mt-10 text-center text-sm/6 text-gray-500">
@@ -59,6 +71,7 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 
+const { loggedIn, user, fetch: refreshSession } = useUserSession()
 
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase as string
@@ -98,6 +111,7 @@ const errorsFrom = ref({
 
 const isSendCodeDisabled = ref(false)
 const sendCodeCountdown = ref(0)
+const isLoginLoading = ref(false)
 let sendCodeCountdownTimer: NodeJS.Timeout | null = null
 const startCountdown = () => {
   sendCodeCountdown.value = 60
@@ -124,6 +138,7 @@ type SendAuthEmailCodeData = v.InferOutput<typeof SendAuthEmailCodeSchema>
 type AuthEmailCodeData = v.InferOutput<typeof AuthEmailCodeSchema>
 
 async function handleAuthEmailSend() {
+  isLoginLoading.value = true
   clearFormErrors()
   errorMsg.value = ''
 
@@ -163,6 +178,7 @@ async function handleAuthEmailSend() {
 }
 
 async function handleLoginFormSubmit() {
+  isLoginLoading.value = true
   clearFormErrors()
   errorMsg.value = ''
 
@@ -187,19 +203,20 @@ async function handleLoginFormSubmit() {
     return
   }
 
-  try {
-    const res = await $fetch('auth/email/verify', {
-      baseURL: apiBase,
-      method: 'POST',
-      body: validatedData
-    })
-    console.log('res: ',res)
-    if (res?.code !== 0) {
-      errorMsg.value = 'Error.'
-    }
-  } catch (error) {
+  $fetch('/api/auth/email-verify', {
+    method: 'POST',
+    body: validatedData
+  })
+  .then(async () => {
+    await refreshSession()
+    await navigateTo('/')
+  })
+  .catch(() => {
     errorMsg.value = 'Network error or server error.'
-  }
+  })
+  .finally(() => {
+    isLoginLoading.value = false
+  })
 }
 
 onUnmounted(() => {
