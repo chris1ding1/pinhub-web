@@ -3,13 +3,13 @@
     <button
         data-modal-target="create-pin-modal"
         data-modal-toggle="create-pin-modal"
-        class="flex items-center justify-center text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800  focus:ring-4 focus:ring-blue-300 focus:outline-none "
+        class="fixed end-6 bottom-6 flex items-center justify-center text-white bg-blue-700 rounded-lg w-14 h-14 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none"
         type="button"
     >
         <svg class="w-5 h-5 transition-transform group-hover:rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
         </svg>
-        <span class="sr-only">Add pin</span>
+        <span class="sr-only">Create new pin</span>
     </button>
     <!-- Main modal -->
     <div id="create-pin-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -30,18 +30,37 @@
                 </div>
                 <!-- Modal body -->
                 <form class="p-4 md:p-5" method="POST">
+                    <div>
+                        <p v-if="errors && errors.msg" class="mt-2 text-sm text-red-800">
+                            {{ errors.msg }}
+                        </p>
+                        <div v-if="errors && errors.items.length > 0" class="mt-2 text-sm text-red-700">
+                            <ul
+                                role="list"
+                                class="list-disc space-y-1 pl-5"
+                            >
+                                <li
+                                v-for="(error, index) in errors.items"
+                                :key="index"
+                                >
+                                {{ error }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <div class="grid gap-4 mb-4 grid-cols-2">
                         <div class="col-span-2">
                             <label for="url" class="block mb-2 text-sm font-medium text-gray-900 ">
                                 URL
                             </label>
-                            <input type="url" name="url" id="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " placeholder="URL" maxlength="2048">
+                            <input v-model="createPinForm.url" type="url" name="url" id="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " placeholder="URL" maxlength="2048">
                         </div>
                         <div class="col-span-2">
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900 ">
                                 Content
                             </label>
-                            <textarea id="content" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="10000"></textarea>
+                            <textarea v-model="createPinForm.content" id="content" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="3000"></textarea>
                         </div>
                         <div class="col-span-2">
                             <span class="block mb-2 text-sm font-medium text-gray-900 ">
@@ -72,6 +91,7 @@
                                 <div class="flex">
                                     <div v-for="pinVisibility in pinVisibilities" :key="pinVisibility.id"  class="flex items-center me-4">
                                         <input
+                                            v-model="createPinForm.visibility"
                                             :id="pinVisibility.id"
                                             type="radio"
                                             :value="pinVisibility.val"
@@ -86,10 +106,24 @@
                             </fieldset>
                         </div>
                     </div>
-                    <button type="button" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ">
+                    <button
+                        @click="handleCreatePinSubmit"
+                        :disabled="isCreatePinSubmitLoading"
+                        type="button"
+                        :class="[
+                            'text-white inline-flex items-center focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center',
+                            isCreatePinSubmitLoading
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-blue-700 hover:bg-blue-800 focus:ring-blue-300'
+                        ]"
+                    >
                         <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                        Add new pin
+                        {{ isCreatePinSubmitLoading ? 'Add new pin...' : 'Add new pin' }}
                     </button>
+                    <div v-if="!loggedIn" class="mt-2 text-sm font-medium text-gray-500">
+                        Not logged in?
+                        <a href="/login" class="text-blue-700 hover:underline dark:text-blue-500">Pleasr Login Or Create account</a>
+                    </div>
                 </form>
             </div>
         </div>
@@ -97,7 +131,12 @@
 </div>
 </template>
 <script setup lang="ts">
+import * as v from 'valibot';
 import { useFlowbite } from '~/composables/useFlowbite';
+
+const { loggedIn } = useUserSession()
+const { pinsStore } = usePins()
+
 onMounted(() => {
   useFlowbite((flowbite) => {
     initFlowbite();
@@ -108,4 +147,76 @@ const pinVisibilities = [
   { id: 'pin-visibility-private', title: 'Private', val: 1},
   { id: 'pin-visibility-public', title: 'Public', val: 2},
 ]
+
+const createPinForm = reactive({
+  url: '',
+  content: '',
+  visibility: PinVisibility.PRIVATE,
+})
+
+const CreatePinSchema = v.pipe(
+  v.object({
+    url: v.pipe(
+      v.string(),
+      v.transform((input) => input.trim()),
+      v.union([
+        v.literal(''),
+        v.pipe(v.string(), v.url(), v.maxLength(2048))
+      ])
+    ),
+    content: v.pipe(
+      v.string(),
+      v.maxLength(3000),
+    ),
+    visibility: v.pipe(
+      v.nonEmpty(),
+      v.number(),
+      v.picklist([PinVisibility.PRIVATE, PinVisibility.PUBLIC]),
+    ),
+  }),
+  v.check(
+    (input) => !(input.url.trim() == '' &&  input.content.trim() == ''),
+    'Please enter either a URL or Content.'
+  )
+);
+
+type CreatePinData = v.InferOutput<typeof CreatePinSchema>;
+
+const errors = ref(null)
+const isCreatePinSubmitLoading = ref(false)
+
+if (!loggedIn.value) {
+  isCreatePinSubmitLoading.value = true
+}
+
+async function handleCreatePinSubmit() {
+  isCreatePinSubmitLoading.value = true
+  errors.value = null
+
+  let validatedData: CreatePinData
+  try {
+    validatedData = v.parse(CreatePinSchema, {
+      url: createPinForm.url,
+      content: createPinForm.content,
+      visibility: createPinForm.visibility,
+    })
+  } catch (error) {
+    isCreatePinSubmitLoading.value = false
+    if (error instanceof v.ValiError) {
+      errors.value = {
+        items: error.issues.map(issue => issue.message),
+      }
+    }
+    return
+  }
+
+  try {
+    const pin = await pinsStore(validatedData);
+    errors.value = null
+  } catch (error) {
+    errors.value.msg = 'Failed to create pin. Please try again.'
+  } finally {
+    isCreatePinSubmitLoading.value = false
+  }
+}
 </script>
