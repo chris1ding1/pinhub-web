@@ -73,3 +73,13 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Links
+
+- 💻 **Backend Repository**: [pinhub-api](https://github.com/chris1ding1/pinhub-api)
+
+## License
+
+[MIT](https://opensource.org/licenses/MIT)
+
+Copyright (c) 2025, [Chris](https://chrisding.xyz)
