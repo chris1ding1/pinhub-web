@@ -37,6 +37,9 @@ const { loggedIn } = useUserSession()
 const config = useRuntimeConfig()
 const title = config.public.appName
 
+useHead({
+  title: title,
+})
 
 const { userPinsIndex } = usePins()
 const pinsParamPage = ref(1)

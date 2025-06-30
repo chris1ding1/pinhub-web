@@ -80,6 +80,10 @@ if (loggedIn.value) {
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase as string
 
+useHead({
+  title: 'Login - ' + config.public.appName,
+})
+
 const errorMsg = ref('')
 
 const authEmailCodeForm = reactive({
