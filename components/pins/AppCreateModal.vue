@@ -135,7 +135,6 @@ import * as v from 'valibot';
 import { useFlowbite } from '~/composables/useFlowbite';
 
 const { loggedIn } = useUserSession()
-const { pinsStore } = usePins()
 
 onMounted(() => {
   useFlowbite((flowbite) => {
@@ -211,10 +210,27 @@ async function handleCreatePinSubmit() {
   }
 
   try {
-    const pin = await pinsStore(validatedData);
-    errors.value = null
+
+    const pin = await useNuxtApp().$api('/pins', {
+      method: 'POST',
+      body: validatedData,
+    })
+
+    if (pin?.code !== 0 || !pin?.data) {
+      errors.value = {
+        msg: 'Failed to create pin. Please try again.',
+        items: []
+      }
+      return
+    }
+
+    window.location.href = '/'
+
   } catch (error) {
-    errors.value.msg = 'Failed to create pin. Please try again.'
+    errors.value = {
+      msg: 'Failed to create pin. Please try again.',
+      items: []
+    }
   } finally {
     isCreatePinSubmitLoading.value = false
   }
