@@ -144,8 +144,8 @@ onMounted(() => {
 });
 
 const pinVisibilities = [
-  { id: 'pin-visibility-private', title: 'Private', val: 1},
-  { id: 'pin-visibility-public', title: 'Public', val: 2},
+  { id: 'pin-visibility-private', title: 'Private', val: PinVisibility.PRIVATE},
+  { id: 'pin-visibility-public', title: 'Public', val: PinVisibility.PUBLIC},
 ]
 
 const createPinForm = reactive({
