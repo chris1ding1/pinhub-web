@@ -25,19 +25,27 @@ const { loggedIn } = useUserSession()
 const config = useRuntimeConfig()
 const title = config.public.appName
 
-const userPins = ref({})
+
 const { userPinsIndex } = usePins()
 const pinsParamPage = ref(1)
 const pinsParamSearch = ref("")
 
-watch(loggedIn, async (newLoggedIn, oldLoggedIn) => {
-  if (newLoggedIn) {
-    userPins.value = await userPinsIndex(1, '', {
-      server: false,
-      lazy: true
-    })
+const { data: userPins, pending, refresh, error } = await useFetch('/users/pins', {
+  query: {
+    page: pinsParamPage,
+    search: pinsParamSearch,
+  },
+  $fetch: useNuxtApp().$api as typeof $fetch,
+  server: false,
+  default: () => ({ data: { items: [] } }),
+  skip: () => !loggedIn.value
+})
+
+watch(loggedIn, (isLoggedIn) => {
+  if (isLoggedIn) {
+    refresh()
   } else {
-    userPins.value = null
+    clear()
   }
-}, { immediate: true })
+})
 </script>
