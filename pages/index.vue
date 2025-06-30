@@ -6,7 +6,8 @@
       </h1>
     </header>
     <main>
-        <ul v-if="userPins?.items?.length" role="list" class="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
+        <PinsAppCreateModal />
+        <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8">
             <li v-for="pin in userPins.data.items" :key="pin.id">
                 {{ pin.content }}
                 {{ pin.image_url }}
