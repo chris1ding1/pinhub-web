@@ -20,6 +20,11 @@ export interface Pin {
   visibility?: PinVisibility;
 }
 
+export interface CreatePinData {
+  url: string;
+  content: string;
+  visibility: PinVisibility;
+}
 
 export const usePins = () => {
   const userPinsIndex = (page: number = 1, search: string = '') => {
@@ -31,10 +36,10 @@ export const usePins = () => {
     })
   }
 
-  const pinsStore = (pinData) => {
+  const pinsStore = (createPinData: CreatePinData) => {
     return useAPI('/pins', {
       method: 'POST',
-      body: pinData,
+      body: createPinData,
     })
   }
 
