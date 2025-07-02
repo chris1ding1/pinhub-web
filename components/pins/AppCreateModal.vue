@@ -54,30 +54,22 @@
                             <label for="url" class="block mb-2 text-sm font-medium text-gray-900 ">
                                 URL
                             </label>
-                            <input v-model="createPinForm.url" type="url" name="url" id="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " placeholder="URL" maxlength="2048">
+                            <input v-model="createPinForm.url" id="url" type="url" name="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " placeholder="URL" maxlength="2048">
                         </div>
                         <div class="col-span-2">
-                            <label for="content" class="block mb-2 text-sm font-medium text-gray-900 ">
+                            <label for="content" class="block mb-2 text-sm font-medium text-gray-900">
                                 Content
                             </label>
-                            <textarea v-model="createPinForm.content" id="content" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="3000"></textarea>
+                            <textarea
+                                v-model="createPinForm.content"
+                                id="content"
+                                rows="4"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="3000"></textarea>
                         </div>
-                        <div class="col-span-2" v-if="false">
-                            <span class="block mb-2 text-sm font-medium text-gray-900 ">
-                                Image
-                            </span>
-                            <div class="flex items-center justify-center w-full">
-                                <label for="pin-image" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                        </svg>
-                                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
-                                    </div>
-                                    <input id="pin-image" type="file" class="hidden" />
-                                </label>
-                            </div>
+                        <div class="col-span-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-900" for="up_file">Image</label>
+                            <input @change="handleFileSelect" id="up_file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" aria-describedby="up_file_help" type="file" accept="image/png, image/jpeg">
+                            <p id="up_file_help" class="mt-1 text-sm text-gray-500">PNG, JPG(MAX. 5MB).</p>
                         </div>
                         <div class="col-span-2" v-if="false">
                             <label for="tags" class="block mb-2 text-sm font-medium text-gray-900 ">
@@ -150,8 +142,14 @@ const pinVisibilities = [
 const createPinForm = reactive({
   url: '',
   content: '',
+  up_file: null as File | null,
   visibility: PinVisibility.PRIVATE,
 })
+
+function handleFileSelect(e: Event) {
+  const input = e.target as HTMLInputElement
+  createPinForm.up_file = input.files?.[0] || null
+}
 
 const CreatePinSchema = v.pipe(
   v.object({
@@ -165,17 +163,25 @@ const CreatePinSchema = v.pipe(
     ),
     content: v.pipe(
       v.string(),
+      v.transform((input) => input.trim()),
       v.maxLength(3000),
     ),
+    up_file: v.optional(v.union([
+      v.literal(null),
+      v.pipe(
+        v.file(),
+        v.mimeType(['image/jpeg', 'image/png'], 'Please select a JPEG or PNG file.'),
+        v.maxSize(1024 * 1024 * 5, 'Please select a file smaller than 5 MB.')
+      )
+    ])),
     visibility: v.pipe(
-      v.nonEmpty(),
       v.number(),
       v.picklist([PinVisibility.PRIVATE, PinVisibility.PUBLIC]),
     ),
   }),
   v.check(
-    (input) => !(input.url.trim() == '' &&  input.content.trim() == ''),
-    'Please enter either a URL or Content.'
+    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && !input.up_file),
+    'Please enter either a URL, Content, or upload an image.'
   )
 );
 
@@ -197,6 +203,7 @@ async function handleCreatePinSubmit() {
     validatedData = v.parse(CreatePinSchema, {
       url: createPinForm.url,
       content: createPinForm.content,
+      up_file: createPinForm.up_file,
       visibility: createPinForm.visibility,
     })
   } catch (error) {
