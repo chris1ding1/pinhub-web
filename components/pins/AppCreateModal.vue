@@ -147,7 +147,7 @@ const pinVisibilities = [
   { id: 'pin-visibility-public', title: 'Public', val: PinVisibility.PUBLIC},
 ]
 
-const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "Music", "Game", "Hackathon", "Open Source", "Job", "Money"])
+const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "Music", "Game", "Hackathon", "Open Source", "Job", "Money", "SEO", "Blog", "News", "Guide", "Help", "Other"])
 
 const createPinForm = reactive({
   url: '',
