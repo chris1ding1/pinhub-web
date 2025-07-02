@@ -165,6 +165,7 @@ async function handleAuthEmailSend() {
         errorsFrom.value.email = emailError.message;
       }
     }
+    isSendCodeDisabled.value = false
     return
   }
 
