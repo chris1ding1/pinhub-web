@@ -139,7 +139,7 @@ const pinVisibilities = [
   { id: 'pin-visibility-public', title: 'Public', val: PinVisibility.PUBLIC},
 ]
 
-const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "Music", "Game", "Hackathon", "Open Source", "Job", "Money", "SEO", "Blog", "News", "Guide", "Help", "Other", "Tip", "Bank", "Share", "Life", "Shop", "Travel", "Free", "VPN", "Link", "Blog", "English", "RPA", "Code", "AWS", "Google", "Apple", "Microsoft", "Facebook", "Twitter", "Instagram", "LinkedIn", "YouTube", "TikTok", "Reddit", "X", "Discord", "Telegram", "WhatsApp", "Skype", "Zoom", "Slack", "Snapchat", "DNS", "DIY", "Website", "Web", "Logo", "App", "Affiliate marketing", "Ranking", "edu", "gov", "blockchain", "make", "sponsor"])
+const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "Music", "Game", "Hackathon", "Open Source", "Job", "Money", "SEO", "Blog", "News", "Guide", "Help", "Other", "Tip", "Bank", "Share", "Life", "Shop", "Travel", "Free", "VPN", "Link", "Blog", "English", "RPA", "Code", "AWS", "Google", "Apple", "Microsoft", "Facebook", "Twitter", "Instagram", "LinkedIn", "YouTube", "TikTok", "Reddit", "X", "Discord", "Telegram", "WhatsApp", "Skype", "Zoom", "Slack", "Snapchat", "DNS", "DIY", "Website", "Web", "Logo", "App", "Affiliate marketing", "Ranking", "edu", "gov", "blockchain", "make", "sponsor", "search", "wfh", "wi-fi", "i18n"])
 
 const createPinForm = reactive({
   url: '',
