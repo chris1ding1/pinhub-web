@@ -68,8 +68,23 @@
                         </div>
                         <div class="col-span-2">
                             <label class="block mb-2 text-sm font-medium text-gray-900" for="up_file">Image</label>
-                            <input @change="handleFileSelect" id="up_file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" aria-describedby="up_file_help" type="file" accept="image/png, image/jpeg">
+                            <input
+                                @change="handleFileSelect"
+                                id="up_file"
+                                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                                aria-describedby="up_file_help"
+                                type="file"
+                                accept="image/png, image/jpeg"
+                                :disabled="isFileUploading"
+                            >
                             <p id="up_file_help" class="mt-1 text-sm text-gray-500">PNG, JPG(MAX. 5MB).</p>
+                            <p v-if="fileUploadError" class="mt-2 text-sm text-red-800">
+                                {{ fileUploadError }}
+                            </p>
+                            <p v-if="createPinForm.file_name" class="mt-1 text-sm text-gray-500">
+                                {{ createPinForm.file_name }}
+                            </p>
+                            <input v-model="createPinForm.file_name" type="hidden" name="file_name">
                         </div>
                         <div class="col-span-2" v-if="false">
                             <label for="tags" class="block mb-2 text-sm font-medium text-gray-900 ">
@@ -144,13 +159,72 @@ const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "
 const createPinForm = reactive({
   url: '',
   content: '',
-  up_file: null as File | null,
+  file_name: '',
   visibility: PinVisibility.PRIVATE,
 })
 
-function handleFileSelect(e: Event) {
+const isFileUploading = ref(false)
+
+const FileSchema = v.pipe(
+  v.file(),
+  v.mimeType(['image/jpeg', 'image/png'], 'Please select a JPEG or PNG file.'),
+  v.maxSize(5242880, 'Please select a file smaller than 5 MB.')
+)
+
+const fileUploadError = ref('')
+
+async function handleFileSelect(e: Event) {
+  if (isFileUploading.value) {
+    return
+  }
+
   const input = e.target as HTMLInputElement
-  createPinForm.up_file = input.files?.[0] || null
+  const file = input.files?.[0]
+
+  fileUploadError.value = ''
+  createPinForm.file_name = ''
+
+  if (!file) {
+    return
+  }
+
+  try {
+    v.parse(FileSchema, file)
+  } catch (error) {
+    if (error instanceof v.ValiError) {
+      fileUploadError.value = error.issues[0]?.message || 'Error.'
+    } else {
+      fileUploadError.value = 'Error.'
+    }
+    input.value = ''
+    return
+  }
+  isFileUploading.value = true
+  isCreatePinSubmitLoading.value = true
+
+  const formData = new FormData();
+  formData.append('up_file', file);
+
+  try {
+    const response = await useNuxtApp().$api('/pins/file', {
+      method: 'POST',
+      body: formData,
+    })
+    const file_name = response?.data?.name.trim()
+    if (file_name == "") {
+      fileUploadError.value = "Failed to upload file."
+      createPinForm.file_name = ''
+      return false
+    }
+    createPinForm.file_name = file_name
+  } catch (error) {
+    fileUploadError.value = "Failed to upload file."
+    createPinForm.file_name = ''
+    return false
+  } finally {
+    isFileUploading.value = false
+    isCreatePinSubmitLoading.value = false
+  }
 }
 
 const CreatePinSchema = v.pipe(
@@ -168,21 +242,17 @@ const CreatePinSchema = v.pipe(
       v.transform((input) => input.trim()),
       v.maxLength(3000),
     ),
-    up_file: v.optional(v.union([
-      v.literal(null),
-      v.pipe(
-        v.file(),
-        v.mimeType(['image/jpeg', 'image/png'], 'Please select a JPEG or PNG file.'),
-        v.maxSize(1024 * 1024 * 5, 'Please select a file smaller than 5 MB.')
-      )
-    ])),
+    file_name: v.pipe(
+      v.string(),
+      v.transform((input) => input.trim()),
+    ),
     visibility: v.pipe(
       v.number(),
       v.picklist([PinVisibility.PRIVATE, PinVisibility.PUBLIC]),
     ),
   }),
   v.check(
-    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && !input.up_file),
+    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && input.file_name.trim() == ''),
     'Please enter either a URL, Content, or upload an image.'
   )
 );
@@ -197,6 +267,7 @@ if (!loggedIn.value) {
 }
 
 async function handleCreatePinSubmit() {
+  isFileUploading.value = true
   isCreatePinSubmitLoading.value = true
   errors.value = null
 
@@ -205,10 +276,11 @@ async function handleCreatePinSubmit() {
     validatedData = v.parse(CreatePinSchema, {
       url: createPinForm.url,
       content: createPinForm.content,
-      up_file: createPinForm.up_file,
+      file_name: createPinForm.file_name,
       visibility: createPinForm.visibility,
     })
   } catch (error) {
+    isFileUploading.value = false
     isCreatePinSubmitLoading.value = false
     if (error instanceof v.ValiError) {
       errors.value = {
@@ -241,6 +313,7 @@ async function handleCreatePinSubmit() {
       items: []
     }
   } finally {
+    isFileUploading.value = false
     isCreatePinSubmitLoading.value = false
   }
 }
