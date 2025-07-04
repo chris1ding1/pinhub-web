@@ -36,13 +36,6 @@ export const usePins = () => {
     })
   }
 
-  const pinsStore = (createPinData: CreatePinData) => {
-    return useAPI('/pins', {
-      method: 'POST',
-      body: createPinData,
-    })
-  }
-
   const pinsUpdate = (id: string, pinData) => {
     return useAPI(`/pins/${id}`, {
       method: 'PUT',
@@ -58,7 +51,6 @@ export const usePins = () => {
 
   return {
     userPinsIndex,
-    pinsStore,
     pinsUpdate,
     pinsDestroy,
   }
