@@ -81,10 +81,10 @@
                             <p v-if="fileUploadError" class="mt-2 text-sm text-red-800">
                                 {{ fileUploadError }}
                             </p>
-                            <p v-if="createPinForm.file_name" class="mt-1 text-sm text-gray-500">
-                                {{ createPinForm.file_name }}
+                            <p v-if="createPinForm.image_path" class="mt-1 text-sm text-gray-500">
+                                {{ createPinForm.image_path }}
                             </p>
-                            <input v-model="createPinForm.file_name" type="hidden" name="file_name">
+                            <input v-model="createPinForm.image_path" type="hidden" name="image_path">
                         </div>
                         <div class="col-span-2" v-if="false">
                             <label for="tags" class="block mb-2 text-sm font-medium text-gray-900 ">
@@ -149,6 +149,19 @@ onMounted(() => {
   });
 });
 
+interface ApiResponse<T = Record<string, unknown>> {
+  code: number;
+  data?: T;
+  message?: string;
+}
+
+interface FileUploadData {
+  name: string;
+  path: string;
+}
+
+type FileUploadResponse = ApiResponse<FileUploadData>
+
 const pinVisibilities = [
   { id: 'pin-visibility-private', title: 'Private', val: PinVisibility.PRIVATE},
   { id: 'pin-visibility-public', title: 'Public', val: PinVisibility.PUBLIC},
@@ -159,7 +172,7 @@ const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "
 const createPinForm = reactive({
   url: '',
   content: '',
-  file_name: '',
+  image_path: '',
   visibility: PinVisibility.PRIVATE,
 })
 
@@ -182,7 +195,7 @@ async function handleFileSelect(e: Event) {
   const file = input.files?.[0]
 
   fileUploadError.value = ''
-  createPinForm.file_name = ''
+  createPinForm.image_path = ''
 
   if (!file) {
     return
@@ -206,20 +219,21 @@ async function handleFileSelect(e: Event) {
   formData.append('up_file', file);
 
   try {
-    const response = await useNuxtApp().$api('/pins/file', {
+    const response = await useNuxtApp().$api<FileUploadResponse>('/pins/file', {
       method: 'POST',
       body: formData,
     })
-    const file_name = response?.data?.name.trim()
-    if (file_name == "") {
+
+    if (response.code !== 0) {
       fileUploadError.value = "Failed to upload file."
-      createPinForm.file_name = ''
+      createPinForm.image_path = ''
       return false
     }
-    createPinForm.file_name = file_name
+
+    createPinForm.image_path = response.data?.path
   } catch (error) {
     fileUploadError.value = "Failed to upload file."
-    createPinForm.file_name = ''
+    createPinForm.image_path = ''
     return false
   } finally {
     isFileUploading.value = false
@@ -242,7 +256,7 @@ const CreatePinSchema = v.pipe(
       v.transform((input) => input.trim()),
       v.maxLength(3000),
     ),
-    file_name: v.pipe(
+    image_path: v.pipe(
       v.string(),
       v.transform((input) => input.trim()),
     ),
@@ -252,7 +266,7 @@ const CreatePinSchema = v.pipe(
     ),
   }),
   v.check(
-    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && input.file_name.trim() == ''),
+    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && input.image_path.trim() == ''),
     'Please enter either a URL, Content, or upload an image.'
   )
 );
@@ -276,7 +290,7 @@ async function handleCreatePinSubmit() {
     validatedData = v.parse(CreatePinSchema, {
       url: createPinForm.url,
       content: createPinForm.content,
-      file_name: createPinForm.file_name,
+      image_path: createPinForm.image_path,
       visibility: createPinForm.visibility,
     })
   } catch (error) {
