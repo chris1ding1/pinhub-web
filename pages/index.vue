@@ -60,7 +60,6 @@ useHead({
   title: title,
 })
 
-const { userPinsIndex } = usePins()
 const pinsParamPage = ref(1)
 const pinsParamSearch = ref("")
 
