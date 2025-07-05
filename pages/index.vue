@@ -1,12 +1,15 @@
 <template>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <header class="mx-auto max-w-3xl text-center items-center justify-center mt-14">
-      <h1 class="text-5xl font-extrabold md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
+    <header class="mx-auto max-w-7xl text-center pt-32">
+      <h1 class="text-4xl font-medium tracking-tight text-gray-900">
         {{ title }}
       </h1>
-      <p v-if="userPins?.data?.items?.length === 0" class="mt-8 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">
-        Pin Your Favorite Links, Notes, and Images Easily.
-      </p>
+      <h2 v-if="!loggedIn || userPins?.data?.items?.length === 0" class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl pt-6">
+        Easily bookmark your favorite links, notes and images.
+      </h2>
+      <div v-if="!loggedIn" class="mt-10 flex justify-center">
+        <a class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" href="/login">Log In / Sign Up</a>
+      </div>
     </header>
     <main>
         <PinsAppCreateModal />
