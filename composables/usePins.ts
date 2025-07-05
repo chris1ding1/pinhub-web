@@ -27,15 +27,6 @@ export interface CreatePinData {
 }
 
 export const usePins = () => {
-  const userPinsIndex = (page: number = 1, search: string = '') => {
-    return useAPI('/users/pins', {
-      query: {
-        page,
-        search,
-      }
-    })
-  }
-
   const pinsUpdate = (id: string, pinData) => {
     return useAPI(`/pins/${id}`, {
       method: 'PUT',
@@ -50,7 +41,6 @@ export const usePins = () => {
   }
 
   return {
-    userPinsIndex,
     pinsUpdate,
     pinsDestroy,
   }
