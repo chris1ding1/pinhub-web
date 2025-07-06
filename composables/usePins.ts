@@ -25,23 +25,3 @@ export interface CreatePinData {
   content: string;
   visibility: PinVisibility;
 }
-
-export const usePins = () => {
-  const pinsUpdate = (id: string, pinData) => {
-    return useAPI(`/pins/${id}`, {
-      method: 'PUT',
-      body: pinData,
-    })
-  }
-
-  const pinsDestroy = (id: string) => {
-    return useAPI(`/pins/${id}`, {
-      method: 'DELETE',
-    })
-  }
-
-  return {
-    pinsUpdate,
-    pinsDestroy,
-  }
-}
