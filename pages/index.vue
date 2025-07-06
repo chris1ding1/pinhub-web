@@ -73,23 +73,39 @@ useHead({
 
 const pinsParamPage = ref(1)
 const pinsParamSearch = ref("")
+const userPins = ref({ data: { items: [] } })
 
-const { data: userPins, pending, refresh, error } = await useFetch('/users/pins', {
-  query: {
-    page: pinsParamPage,
-    search: pinsParamSearch,
-  },
-  $fetch: useNuxtApp().$api as typeof $fetch,
-  server: false,
-  default: () => ({ data: { items: [] } }),
-  skip: () => !loggedIn.value
-})
+const getUserPins = async () => {
+  if (!loggedIn.value) {
+    userPins.value = { data: { items: [] } }
+    return
+  }
+
+  const response = await useNuxtApp().$api('/users/pins', {
+      query: {
+        page: pinsParamPage.value,
+        search: pinsParamSearch.value,
+      }
+    })
+
+  userPins.value = response
+}
+
+const clearUserPins = () => {
+  userPins.value = { data: { items: [] } }
+}
 
 watch(loggedIn, (isLoggedIn) => {
   if (isLoggedIn) {
-    refresh()
+    getUserPins()
   } else {
-    clear()
+    clearUserPins()
+  }
+})
+
+onMounted(() => {
+  if (loggedIn.value) {
+    getUserPins()
   }
 })
 
