@@ -23,6 +23,31 @@
         <PinsAppCreateModal v-if="loggedIn" />
         <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 my-10">
             <li v-for="pin in userPins.data.items" :key="pin.id">
+                <Menu as="div" class="relative ml-auto flex justify-end">
+                    <MenuButton class="relative block text-gray-400 hover:text-gray-500">
+                        <span class="absolute -inset-2.5" />
+                        <span class="sr-only">Open options</span>
+                        <EllipsisHorizontalIcon class="size-5" aria-hidden="true" />
+                    </MenuButton>
+                    <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                        <MenuItems class="absolute right-0 z-10 mt-5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-hidden">
+                        <MenuItem v-slot="{ active }">
+                            <button
+                                @click="deletePin(pin.id)"
+                                type="button"
+                                :disabled="deletingPins.has(pin.id)"
+                                :class="[
+                                'text-red-600 w-full text-left',
+                                deletingPins.has(pin.id) ? 'text-gray-400 cursor-not-allowed' : 'text-red-600',
+                                active ? 'bg-gray-50 outline-hidden' : '', 'block px-3 py-1 text-sm/6'
+                                ]"
+                            >
+                                {{ deletingPins.has(pin.id) ? 'Delete...' : 'Delete' }}
+                            </button>
+                        </MenuItem>
+                        </MenuItems>
+                    </transition>
+                </Menu>
                 <div
                     v-if="isImageOnly(pin)"
                 >
@@ -62,6 +87,9 @@
   </div>
 </template>
 <script setup lang="ts">
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { EllipsisHorizontalIcon } from '@heroicons/vue/20/solid'
+
 const { loggedIn } = useUserSession()
 
 const config = useRuntimeConfig()
@@ -89,6 +117,26 @@ const getUserPins = async () => {
     })
 
   userPins.value = response
+}
+
+const deletingPins = ref(new Set<string>())
+const deletePin = async (pinId: string) => {
+  if (deletingPins.value.has(pinId)) {
+    return
+  }
+  try {
+    const response = await useNuxtApp().$api(`/pins/${pinId}`, {
+        method: 'DELETE',
+    })
+    if (response.code !== 0) {
+        return false
+    }
+    userPins.value.data.items = userPins.value.data.items.filter(pin => pin.id !== pinId)
+  } catch (error) {
+    return false
+  } finally {
+    deletingPins.value.delete(pinId)
+  }
 }
 
 const clearUserPins = () => {
