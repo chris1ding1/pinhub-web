@@ -20,7 +20,7 @@
       </div>
     </header>
     <main>
-        <PinsAppCreateModal />
+        <PinsAppCreateModal v-if="loggedIn" />
         <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 my-10">
             <li v-for="pin in userPins.data.items" :key="pin.id">
                 <div
