@@ -66,6 +66,24 @@
                                 rows="4"
                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="3000"></textarea>
                         </div>
+                        <div class="col-span-2" v-if="false">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 ">
+                                Recorder
+                            </label>
+                            <button @click="toggleRecording" type="button" class="text-white inline-flex items-center focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-blue-700 hover:bg-blue-800 focus:ring-blue-300">
+                                {{ isRecording ? 'Stop Recording' : 'Start Recording' }}
+                            </button>
+                            <p v-if="recordingTime > 0" class="mt-2 text-gray-700">
+                                Recording: {{ recordingTime }} seconds
+                            </p>
+                            <div v-if="audioUrl" class="mt-4 space-y-2">
+                                <audio :src="audioUrl" controls class="w-full rounded shadow" />
+                                <button @click="deleteRecording" class="text-sm text-red-600 underline">
+                                    Delete Recording
+                                </button>
+                            </div>
+                            <input type="hidden" name="audio_path" :value="audioUrl">
+                        </div>
                         <div class="col-span-2">
                             <label class="block mb-2 text-sm font-medium text-gray-900" for="up_file">Image</label>
                             <input
@@ -140,6 +158,9 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 import { useFlowbite } from '~/composables/useFlowbite';
+import {
+    MicrophoneIcon,
+} from '@heroicons/vue/24/outline'
 
 const { loggedIn } = useUserSession()
 
@@ -168,6 +189,66 @@ const pinVisibilities = [
 ]
 
 const pinTagsOptions = ref(["Image", "Tool", "Develop", "AI", "TODO", "Video", "Music", "Game", "Hackathon", "Open Source", "Job", "Money", "SEO", "Blog", "News", "Guide", "Help", "Other", "Tip", "Bank", "Share", "Life", "Shop", "Travel", "Free", "VPN", "Link", "Blog", "English", "RPA", "Code", "AWS", "Google", "Apple", "Microsoft", "Facebook", "Twitter", "Instagram", "LinkedIn", "YouTube", "TikTok", "Reddit", "X", "Discord", "Telegram", "WhatsApp", "Skype", "Zoom", "Slack", "Snapchat", "DNS", "DIY", "Website", "Web", "Logo", "App", "Affiliate marketing", "Ranking", "edu", "gov", "blockchain", "make", "sponsor", "search", "wfh", "wi-fi", "i18n"])
+
+const isRecording = ref(false)
+const recordingTime = ref(0)
+const mediaStream = ref(null)
+const mediaRecorder = ref(null)
+const audioChunks = []
+const audioUrl = ref(null)
+let recordingTimerId = null
+
+const startRecording = async () => {
+  try {
+    mediaStream.value = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder.value = new MediaRecorder(mediaStream.value)
+
+    audioChunks.length = 0
+    mediaRecorder.value.ondataavailable = (e) => {
+      audioChunks.push(e.data)
+    }
+
+    mediaRecorder.value.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
+      if (mediaStream.value) {
+        mediaStream.value.getTracks().forEach(track => track.stop())
+        mediaStream.value = null
+      }
+      audioUrl.value = URL.createObjectURL(audioBlob)
+    }
+
+    mediaRecorder.value.start()
+    isRecording.value = true
+
+    recordingTime.value = 0
+    recordingTimerId = setInterval(() => {
+      recordingTime.value++
+      if (recordingTime.value >= 15) {
+        stopRecording()
+      }
+    }, 1000)
+  } catch (err) {
+    console.error('Recording failed:', err)
+  }
+}
+
+const stopRecording = () => {
+  if (mediaRecorder.value && mediaRecorder.value.state !== 'inactive') {
+    mediaRecorder.value.stop()
+  }
+  isRecording.value = false
+  clearInterval(recordingTimerId)
+}
+
+const toggleRecording = () => {
+  isRecording.value ? stopRecording() : startRecording()
+}
+
+const deleteRecording = () => {
+  audioUrl.value = null
+  recordingTime.value = 0
+}
+
 
 const createPinForm = reactive({
   url: '',
