@@ -66,7 +66,7 @@
                                 rows="4"
                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write pin content here" maxlength="3000"></textarea>
                         </div>
-                        <div class="col-span-2" v-if="false">
+                        <div class="col-span-2">
                             <label class="block mb-2 text-sm font-medium text-gray-900 ">
                                 Recorder
                             </label>
@@ -82,7 +82,14 @@
                                     Delete Recording
                                 </button>
                             </div>
-                            <input type="hidden" name="audio_path" :value="audioUrl">
+                            <div
+                                v-if="uploadAudioError"
+                                class="mt-2 text-sm text-red-800"
+                            >
+                                <ExclamationCircleIcon class="pointer-events-none mr-3 size-5 self-center text-red-500 sm:size-4" aria-hidden="true" />
+                                {{ uploadAudioError }}
+                            </div>
+                            <input type="hidden" name="audio_path" :value="audioPath">
                         </div>
                         <div class="col-span-2">
                             <label class="block mb-2 text-sm font-medium text-gray-900" for="up_file">Image</label>
@@ -158,6 +165,7 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 import { useFlowbite } from '~/composables/useFlowbite';
+import { ExclamationCircleIcon } from '@heroicons/vue/16/solid'
 import {
     MicrophoneIcon,
 } from '@heroicons/vue/24/outline'
@@ -196,10 +204,14 @@ const mediaStream = ref(null)
 const mediaRecorder = ref(null)
 const audioChunks = []
 const audioUrl = ref(null)
+const audioBlob = ref(null)
+const audioPath = ref("")
+const uploadAudioError = ref("")
 let recordingTimerId = null
 
 const startRecording = async () => {
   try {
+    uploadAudioError.value = ''
     mediaStream.value = await navigator.mediaDevices.getUserMedia({ audio: true })
     mediaRecorder.value = new MediaRecorder(mediaStream.value)
 
@@ -208,13 +220,30 @@ const startRecording = async () => {
       audioChunks.push(e.data)
     }
 
-    mediaRecorder.value.onstop = () => {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
+    mediaRecorder.value.onstop = async() => {
+      audioBlob.value = new Blob(audioChunks, { type: 'audio/webm' })
       if (mediaStream.value) {
         mediaStream.value.getTracks().forEach(track => track.stop())
         mediaStream.value = null
       }
-      audioUrl.value = URL.createObjectURL(audioBlob)
+      try {
+        isCreatePinSubmitLoading.value = true
+        const formData = new FormData()
+        formData.append('audio_file', audioBlob.value)
+
+        const response = await useNuxtApp().$api('/pins/audio', {
+          method: 'POST',
+          body: formData,
+        })
+        uploadAudioError.value = ''
+        console.log('Upload success:', response)
+      } catch (err) {
+        uploadAudioError.value = 'Failed to upload audio.'
+        console.error('Upload failed:', err)
+      } finally {
+        isCreatePinSubmitLoading.value = false
+      }
+      audioUrl.value = URL.createObjectURL(audioBlob.value)
     }
 
     mediaRecorder.value.start()
