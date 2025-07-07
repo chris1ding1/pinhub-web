@@ -385,8 +385,8 @@ const CreatePinSchema = v.pipe(
     ),
   }),
   v.check(
-    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && input.image_path.trim() == ''),
-    'Please enter either a URL, Content, or upload an image.'
+    (input) => !(input.url.trim() == '' &&  input.content.trim() == '' && input.image_path.trim() == '' && input.audio_path.trim() == ''),
+    'Please enter either a URL, Content, or upload an image or audio.'
   )
 );
 
