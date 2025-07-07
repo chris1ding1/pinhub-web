@@ -242,6 +242,9 @@ const startRecording = async () => {
         }
         uploadAudioError.value = ''
         createPinForm.audio_path = response?.data?.path
+        if (createPinForm.content == '' && response?.data?.text) {
+            createPinForm.content = response.data.text
+        }
       } catch (err) {
         uploadAudioError.value = 'Failed to upload audio.'
       } finally {
@@ -280,6 +283,7 @@ const toggleRecording = () => {
 const deleteRecording = () => {
   audioUrl.value = null
   recordingTime.value = 0
+  uploadAudioError.value = ""
   createPinForm.audio_path = ""
 }
 
