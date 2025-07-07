@@ -55,9 +55,9 @@
                 </div>
                 <div v-else class="border border-gray-200 rounded-2xl shadow-sm p-6">
                     <div class="flex items-start gap-4">
-                        <div class="flex-1 min-w-0">
+                        <div class="flex flex-col gap-2 flex-1">
                             <p
-                                class="truncate text-sm font-medium text-gray-900 line-clamp-3"
+                                class="text-sm font-medium text-gray-900 line-clamp-3 break-words"
                             >
                                 {{ pin.content || (pin.url ? pin.url : "") }}
                             </p>
