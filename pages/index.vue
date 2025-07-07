@@ -54,8 +54,15 @@
                     <img :src="pin.image_url" class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75">
                 </div>
                 <div v-else class="border border-gray-200 rounded-2xl shadow-sm p-6">
-                    <div class="flex items-start gap-4">
-                        <div class="flex flex-col gap-2 flex-1">
+                    <div class="flex flex-col h-full gap-4">
+                        <div v-if="pin.image_url" class="flex-shrink-0">
+                            <img
+                                v-if="pin.image_url"
+                                :src="pin.image_url"
+                                class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75"
+                            >
+                        </div>
+                        <div class="flex-1 space-y-3">
                             <p
                                 class="text-sm font-medium text-gray-900 line-clamp-3 break-words"
                             >
@@ -68,18 +75,12 @@
                                 :title="pin.url"
                                 target="_blank"
                                 rel="nofollow noopener"
-                                class="truncate text-sm text-gray-500"
+                                class="block truncate text-sm text-gray-500"
                             >
                                 {{ pin.url_host }}
                             </a>
                         </div>
-                        <div v-if="pin.image_url" class="flex-none w-full sm:w-1/2">
-                            <img
-                                v-if="pin.image_url"
-                                :src="pin.image_url"
-                                class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75"
-                            >
-                        </div>
+
                     </div>
                 </div>
             </li>
