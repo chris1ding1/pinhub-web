@@ -61,6 +61,7 @@
                             >
                                 {{ pin.content || (pin.url ? pin.url : "") }}
                             </p>
+                            <audio v-if="pin.audio_url" :src="pin.audio_url" controls class="w-full rounded" />
                             <a
                                 v-if="pin.url"
                                 :href="pin.url"
