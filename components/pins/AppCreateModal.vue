@@ -89,7 +89,7 @@
                                 <ExclamationCircleIcon class="pointer-events-none mr-3 size-5 self-center text-red-500 sm:size-4" aria-hidden="true" />
                                 {{ uploadAudioError }}
                             </div>
-                            <input type="hidden" name="audio_path" :value="audioPath">
+                            <input v-model="createPinForm.audio_path" type="hidden">
                         </div>
                         <div class="col-span-2">
                             <label class="block mb-2 text-sm font-medium text-gray-900" for="up_file">Image</label>
@@ -205,11 +205,12 @@ const mediaRecorder = ref(null)
 const audioChunks = []
 const audioUrl = ref(null)
 const audioBlob = ref(null)
-const audioPath = ref("")
 const uploadAudioError = ref("")
 let recordingTimerId = null
 
 const startRecording = async () => {
+  createPinForm.audio_path = ""
+  isCreatePinSubmitLoading.value = true
   try {
     uploadAudioError.value = ''
     mediaStream.value = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -221,13 +222,12 @@ const startRecording = async () => {
     }
 
     mediaRecorder.value.onstop = async() => {
-      audioBlob.value = new Blob(audioChunks, { type: 'audio/webm' })
+      audioBlob.value = new Blob(audioChunks, { type: "audio/webm" })
       if (mediaStream.value) {
         mediaStream.value.getTracks().forEach(track => track.stop())
         mediaStream.value = null
       }
       try {
-        isCreatePinSubmitLoading.value = true
         const formData = new FormData()
         formData.append('audio_file', audioBlob.value)
 
@@ -235,11 +235,15 @@ const startRecording = async () => {
           method: 'POST',
           body: formData,
         })
+
+        if (response?.code !== 0) {
+            uploadAudioError.value = "Failed to upload audio."
+            return false
+        }
         uploadAudioError.value = ''
-        console.log('Upload success:', response)
+        createPinForm.audio_path = response?.data?.path
       } catch (err) {
         uploadAudioError.value = 'Failed to upload audio.'
-        console.error('Upload failed:', err)
       } finally {
         isCreatePinSubmitLoading.value = false
       }
@@ -276,12 +280,13 @@ const toggleRecording = () => {
 const deleteRecording = () => {
   audioUrl.value = null
   recordingTime.value = 0
+  createPinForm.audio_path = ""
 }
-
 
 const createPinForm = reactive({
   url: '',
   content: '',
+  audio_path: '',
   image_path: '',
   visibility: PinVisibility.PRIVATE,
 })
@@ -366,6 +371,10 @@ const CreatePinSchema = v.pipe(
       v.transform((input) => input.trim()),
       v.maxLength(3000),
     ),
+    audio_path: v.pipe(
+      v.string(),
+      v.transform((input) => input.trim()),
+    ),
     image_path: v.pipe(
       v.string(),
       v.transform((input) => input.trim()),
@@ -400,6 +409,7 @@ async function handleCreatePinSubmit() {
     validatedData = v.parse(CreatePinSchema, {
       url: createPinForm.url,
       content: createPinForm.content,
+      audio_path: createPinForm.audio_path,
       image_path: createPinForm.image_path,
       visibility: createPinForm.visibility,
     })
