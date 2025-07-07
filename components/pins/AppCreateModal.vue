@@ -70,7 +70,17 @@
                             <label class="block mb-2 text-sm font-medium text-gray-900 ">
                                 Recorder
                             </label>
-                            <button @click="toggleRecording" type="button" class="text-white inline-flex items-center focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-blue-700 hover:bg-blue-800 focus:ring-blue-300">
+                            <button
+                                :disabled="isAudioUploading"
+                                @click="toggleRecording"
+                                type="button"
+                                :class="[
+                                    'inline-flex items-center focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center',
+                                    isAudioUploading
+                                        ? 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                                        : 'text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300'
+                                ]"
+                            >
                                 {{ isRecording ? 'Stop Recording' : 'Start Recording' }}
                             </button>
                             <p v-if="recordingTime > 0" class="mt-2 text-gray-700">
@@ -115,7 +125,7 @@
                             <label for="tags" class="block mb-2 text-sm font-medium text-gray-900 ">
                                 Tags
                             </label>
-                            <input type="text" name="tags" id="tags" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="tags" disabled maxlength="255">
+                            <input type="text" name="tags" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="tags" maxlength="255">
                         </div>
                         <div class="col-span-2">
                             <fieldset>
@@ -206,9 +216,13 @@ const audioChunks = []
 const audioUrl = ref(null)
 const audioBlob = ref(null)
 const uploadAudioError = ref("")
+const isAudioUploading = ref(false)
 let recordingTimerId = null
 
 const startRecording = async () => {
+  if (isAudioUploading.value) {
+    return
+  }
   createPinForm.audio_path = ""
   isCreatePinSubmitLoading.value = true
   try {
@@ -227,6 +241,7 @@ const startRecording = async () => {
         mediaStream.value.getTracks().forEach(track => track.stop())
         mediaStream.value = null
       }
+      isAudioUploading.value = true
       try {
         const formData = new FormData()
         formData.append('audio_file', audioBlob.value)
@@ -248,6 +263,7 @@ const startRecording = async () => {
       } catch (err) {
         uploadAudioError.value = 'Failed to upload audio.'
       } finally {
+        isAudioUploading.value = false
         isCreatePinSubmitLoading.value = false
       }
       audioUrl.value = URL.createObjectURL(audioBlob.value)
@@ -277,6 +293,9 @@ const stopRecording = () => {
 }
 
 const toggleRecording = () => {
+  if (isAudioUploading.value) {
+    return
+  }
   isRecording.value ? stopRecording() : startRecording()
 }
 
@@ -285,6 +304,7 @@ const deleteRecording = () => {
   recordingTime.value = 0
   uploadAudioError.value = ""
   createPinForm.audio_path = ""
+  isAudioUploading.value = false
 }
 
 const createPinForm = reactive({
