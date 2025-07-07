@@ -21,7 +21,7 @@
     </header>
     <main>
         <PinsAppCreateModal v-if="loggedIn" />
-        <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 my-10">
+        <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 mt-10 mb-30">
             <li v-for="pin in userPins.data.items" :key="pin.id">
                 <Menu as="div" class="relative ml-auto flex justify-end">
                     <MenuButton class="relative block text-gray-400 hover:text-gray-500">
