@@ -176,6 +176,9 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 import { useFlowbite } from '~/composables/useFlowbite';
+import {
+    initModals,
+ } from 'flowbite'
 import { ExclamationCircleIcon } from '@heroicons/vue/16/solid'
 import {
     MicrophoneIcon,
@@ -184,10 +187,10 @@ import {
 const { loggedIn } = useUserSession()
 
 onMounted(() => {
-  useFlowbite((flowbite) => {
-    initFlowbite();
-  });
-});
+    useFlowbite(() => {
+        initModals();
+    })
+})
 
 interface ApiResponse<T = Record<string, unknown>> {
   code: number;
