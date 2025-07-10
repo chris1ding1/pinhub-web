@@ -186,9 +186,11 @@ import {
 
 const { loggedIn } = useUserSession()
 
+const modalInstance = ref(null)
 onMounted(() => {
     useFlowbite(() => {
         initModals();
+        modalInstance.value = FlowbiteInstances.getInstance('Modal', 'create-pin-modal');
     })
 })
 
@@ -427,6 +429,13 @@ if (!loggedIn.value) {
   isCreatePinSubmitLoading.value = true
 }
 
+
+const closeModalAndReset = () => {
+  if (modalInstance.value) {
+    modalInstance.value.hide()
+  }
+}
+
 async function handleCreatePinSubmit() {
   isFileUploading.value = true
   isCreatePinSubmitLoading.value = true
@@ -467,7 +476,7 @@ async function handleCreatePinSubmit() {
       return
     }
 
-    window.location.href = '/'
+    closeModalAndReset()
 
   } catch (error) {
     errors.value = {
