@@ -25,7 +25,7 @@
                         <transition leave-active-class="transition ease-in duration-100"
                             leave-from-class="opacity-100" leave-to-class="opacity-0">
                             <ListboxOptions
-                                class="absolute z-10 mt-1 max-h-56 min-w-48 max-w-64 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden sm:text-sm">
+                                class="absolute z-20 mt-1 max-h-56 min-w-48 max-w-64 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden sm:text-sm">
                                 <ListboxOption as="template" v-for="searchType in searchTypes" :key="searchType.id"
                                     :value="searchType" v-slot="{ active, selected }"
                                     :disabled="isLastSelectedItem(searchType)">
