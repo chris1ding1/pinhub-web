@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid'
-import { CheckIcon, ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { CheckIcon } from '@heroicons/vue/20/solid'
 
 const searchTypes = [
     {
