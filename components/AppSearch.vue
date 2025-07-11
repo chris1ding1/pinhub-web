@@ -55,7 +55,7 @@
                     </Listbox>
                 </div>
                 <input id="search" v-model="search"
-                    class="block min-w-0 grow py-2.5 pr-3 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 border-l border-gray-300 rounded-r-md"
+                    class="block min-w-0 grow py-2.5 pr-3 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 border-none focus:border-none outline-none rounded-r-md"
                     type="search" placeholder="Search" required>
             </div>
         </div>
