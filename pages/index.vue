@@ -27,37 +27,35 @@
                 :key="pin.id"
                 class="mb-8 break-inside-avoid"
             >
-                <Menu as="div" class="relative ml-auto flex justify-end">
-                    <MenuButton class="relative block text-gray-400 hover:text-gray-500">
-                        <span class="absolute -inset-2.5" />
-                        <span class="sr-only">Open options</span>
-                        <EllipsisHorizontalIcon class="size-5" aria-hidden="true" />
-                    </MenuButton>
-                    <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                        <MenuItems class="absolute right-0 z-10 mt-5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-hidden">
-                        <MenuItem v-slot="{ active }">
-                            <button
-                                @click="deletePin(pin.id)"
-                                type="button"
-                                :disabled="deletingPins.has(pin.id)"
-                                :class="[
-                                'text-red-600 w-full text-left',
-                                deletingPins.has(pin.id) ? 'text-gray-400 cursor-not-allowed' : 'text-red-600',
-                                active ? 'bg-gray-50 outline-hidden' : '', 'block px-3 py-1 text-sm/6'
-                                ]"
-                            >
-                                {{ deletingPins.has(pin.id) ? 'Delete...' : 'Delete' }}
-                            </button>
-                        </MenuItem>
-                        </MenuItems>
-                    </transition>
-                </Menu>
-                <div
-                    v-if="isImageOnly(pin)"
-                >
-                    <img :src="pin.image_url" class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75">
-                </div>
-                <div v-else class="border border-gray-200 rounded-2xl shadow-sm p-6 space-y-3">
+                <div :class="[
+                    'relative',
+                    isImageOnly(pin)? '': 'border border-gray-200 rounded-2xl shadow-sm p-6 space-y-3',
+                    ]">
+                    <Menu as="div" class="absolute top-2 right-2 z-10 flex justify-end">
+                        <MenuButton class="relative block text-gray-400 hover:text-gray-500">
+                            <span class="absolute -inset-2.5" />
+                            <span class="sr-only">Open options</span>
+                            <EllipsisHorizontalIcon class="size-5" aria-hidden="true" />
+                        </MenuButton>
+                        <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                            <MenuItems class="absolute right-0 z-10 mt-5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-hidden">
+                            <MenuItem v-slot="{ active }">
+                                <button
+                                    @click="deletePin(pin.id)"
+                                    type="button"
+                                    :disabled="deletingPins.has(pin.id)"
+                                    :class="[
+                                    'text-red-600 w-full text-left',
+                                    deletingPins.has(pin.id) ? 'text-gray-400 cursor-not-allowed' : 'text-red-600',
+                                    active ? 'bg-gray-50 outline-hidden' : '', 'block px-3 py-1 text-sm/6'
+                                    ]"
+                                >
+                                    {{ deletingPins.has(pin.id) ? 'Delete...' : 'Delete' }}
+                                </button>
+                            </MenuItem>
+                            </MenuItems>
+                        </transition>
+                    </Menu>
                     <img
                         v-if="pin.image_url"
                         :src="pin.image_url"
