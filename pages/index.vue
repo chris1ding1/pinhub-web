@@ -20,7 +20,7 @@
       </div>
     </header>
     <main>
-        <PinsAppCreateModal v-if="loggedIn" />
+        <PinsAppCreateModal v-if="loggedIn" @pin-created="handlePinCreated"/>
         <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 mt-10 mb-30">
             <li v-for="pin in userPins.data.items" :key="pin.id">
                 <Menu as="div" class="relative ml-auto flex justify-end">
@@ -161,5 +161,9 @@ onMounted(() => {
 
 const isImageOnly = (pin: any) => {
   return pin.image_url && !pin.content && !pin.url
+}
+
+const handlePinCreated = (newPin: any) => {
+  userPins.value.data.items.push(newPin)
 }
 </script>

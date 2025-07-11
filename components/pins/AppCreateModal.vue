@@ -436,6 +436,10 @@ const closeModalAndReset = () => {
   }
 }
 
+const emit = defineEmits<{
+  pinCreated: [pin: any]
+}>()
+
 async function handleCreatePinSubmit() {
   isFileUploading.value = true
   isCreatePinSubmitLoading.value = true
@@ -476,6 +480,7 @@ async function handleCreatePinSubmit() {
       return
     }
 
+    emit('pinCreated', pin.data)
     closeModalAndReset()
 
   } catch (error) {
