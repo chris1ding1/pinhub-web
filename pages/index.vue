@@ -21,8 +21,12 @@
     </header>
     <main>
         <PinsAppCreateModal v-if="loggedIn" @pin-created="handlePinCreated"/>
-        <ul v-if="userPins?.data?.items?.length" role="list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 xl:gap-x-8 mt-10 mb-30">
-            <li v-for="pin in userPins.data.items" :key="pin.id">
+        <ul v-if="userPins?.data?.items?.length" role="list" class="columns-2 sm:columns-3 lg:columns-4 gap-x-6 xl:gap-x-8 mt-10 mb-30">
+            <li
+                v-for="pin in userPins.data.items"
+                :key="pin.id"
+                class="mb-8 break-inside-avoid"
+            >
                 <Menu as="div" class="relative ml-auto flex justify-end">
                     <MenuButton class="relative block text-gray-400 hover:text-gray-500">
                         <span class="absolute -inset-2.5" />
@@ -53,35 +57,33 @@
                 >
                     <img :src="pin.image_url" class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75">
                 </div>
-                <div v-else class="border border-gray-200 rounded-2xl shadow-sm p-6">
-                    <div class="flex flex-col h-full gap-4">
-                        <div v-if="pin.image_url" class="flex-shrink-0">
-                            <img
-                                v-if="pin.image_url"
-                                :src="pin.image_url"
-                                class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75"
-                            >
-                        </div>
-                        <div class="flex-1 space-y-3">
-                            <p
-                                class="text-sm font-medium text-gray-900 line-clamp-3 break-words"
-                            >
-                                {{ pin.content || (pin.url ? pin.url : "") }}
-                            </p>
-                            <audio v-if="pin.audio_url" :src="pin.audio_url" controls class="w-full rounded" />
-                            <a
-                                v-if="pin.url"
-                                :href="pin.url"
-                                :title="pin.url"
-                                target="_blank"
-                                rel="nofollow noopener"
-                                class="block truncate text-sm text-gray-500"
-                            >
-                                {{ pin.url_host }}
-                            </a>
-                        </div>
-
-                    </div>
+                <div v-else class="border border-gray-200 rounded-2xl shadow-sm p-6 space-y-3">
+                    <img
+                        v-if="pin.image_url"
+                        :src="pin.image_url"
+                        class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75"
+                    >
+                    <p
+                        class="text-sm font-medium text-gray-900 line-clamp-3 break-words"
+                    >
+                        {{ pin.content || (pin.url ? pin.url : "") }}
+                    </p>
+                    <audio
+                        v-if="pin.audio_url"
+                        :src="pin.audio_url"
+                        controls
+                        class="w-full rounded"
+                    />
+                    <a
+                        v-if="pin.url"
+                        :href="pin.url"
+                        :title="pin.url"
+                        target="_blank"
+                        rel="nofollow noopener"
+                        class="block truncate text-sm text-gray-500"
+                    >
+                        {{ pin.url_host }}
+                    </a>
                 </div>
             </li>
         </ul>
