@@ -79,7 +79,7 @@ const searchTypes = [
     {
         id: 2,
         name: 'Bing',
-        avatar: '/images/search-engine/bing.png',
+        avatar: '/images/search-engine/bing.ico',
         query: 'https://www.bing.com/search?q=',
     },
     {
