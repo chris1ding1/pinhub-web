@@ -57,7 +57,7 @@
                 <input id="search"
                     v-model.trim="search"
                     @keyup.enter="handleSearch"
-                    class="block min-w-0 grow py-2.5 pr-3 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 border-none focus:border-none outline-none rounded-r-md"
+                    class="block min-w-0 grow py-2.5 pr-3 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 focus:ring-0 border-none focus:border-none outline-none rounded-r-md"
                     type="search" placeholder="Search" required>
             </div>
         </div>
