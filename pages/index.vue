@@ -59,7 +59,8 @@
                     <img
                         v-if="pin.image_url"
                         :src="pin.image_url"
-                        class="rounded-lg pointer-events-none aspect-10/7 object-cover group-hover:opacity-75"
+                        @click="openImageModal(pin.image_url)"
+                        class="rounded-lg aspect-10/7 object-cover group-hover:opacity-75"
                     >
                     <p
                         class="text-sm font-medium text-gray-900 line-clamp-3 break-words"
@@ -86,11 +87,43 @@
             </li>
         </ul>
     </main>
+    <TransitionRoot appear :show="isImageModalOpen" as="template">
+        <Dialog as="div" :open="isImageModalOpen" @close="closeImageModal" class="relative z-20">
+            <button class="sr-only" @click="closeImageModal">Close</button>
+            <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0"
+                enter-to="opacity-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100"
+                leave-to="opacity-0"
+            >
+                <div class="fixed inset-0 bg-black/25" />
+            </TransitionChild>
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                        <DialogPanel class="w-full max-w-2xl transform overflow-hidden text-center align-middle transition-all flex items-center justify-center sm:p-6">
+                            <div>
+                                <img
+                                    v-if="selectedImage"
+                                    :src="selectedImage"
+
+                                    class="max-w-full max-h-full object-contain"
+                                >
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
   </div>
 </template>
 <script setup lang="ts">
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-import { EllipsisHorizontalIcon } from '@heroicons/vue/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems, Dialog, DialogPanel,  TransitionRoot, TransitionChild } from '@headlessui/vue'
+import { EllipsisHorizontalIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 
 const { loggedIn } = useUserSession()
 
@@ -165,5 +198,18 @@ const isImageOnly = (pin: any) => {
 
 const handlePinCreated = (newPin: any) => {
   userPins.value.data.items.push(newPin)
+}
+
+const isImageModalOpen = ref(false)
+const selectedImage = ref<string | null>(null)
+
+const openImageModal = (imageUrl: string) => {
+  isImageModalOpen.value = true
+  selectedImage.value = imageUrl
+}
+
+const closeImageModal = () => {
+  isImageModalOpen.value = false
+  selectedImage.value = null
 }
 </script>
