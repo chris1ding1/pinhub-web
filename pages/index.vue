@@ -32,7 +32,7 @@
                     isImageOnly(pin)? '': 'border border-gray-200 rounded-2xl shadow-sm p-6 space-y-3',
                     ]">
                     <Menu as="div" class="absolute top-2 right-2 z-10 flex justify-end">
-                        <MenuButton class="relative block text-gray-400 hover:text-gray-500">
+                        <MenuButton class="relative block text-gray-600 hover:text-gray-700">
                             <span class="absolute -inset-2.5" />
                             <span class="sr-only">Open options</span>
                             <EllipsisHorizontalIcon class="size-5" aria-hidden="true" />
