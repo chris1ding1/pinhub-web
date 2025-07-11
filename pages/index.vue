@@ -4,6 +4,9 @@
       <h1 class="text-4xl font-medium tracking-tight text-gray-900">
         <span class="md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">{{ title }}</span>
       </h1>
+      <div class="mx-auto max-w-3xl">
+        <AppSearch />
+      </div>
       <h2 v-if="!loggedIn || userPins?.data?.items?.length === 0" class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl pt-6">
         Easily save
         <span class="relative whitespace-nowrap text-blue-600">
