@@ -85,16 +85,20 @@ const searchTypes = [
     {
         id: 3,
         name: 'DuckDuckGo',
-        avatar:
-            '/images/search-engine/duckduckgo.ico',
+        avatar: '/images/search-engine/duckduckgo.ico',
         query: 'https://duckduckgo.com/?q=',
     },
     {
         id: 4,
         name: 'Yandex',
-        avatar:
-            '/images/search-engine/yandex.png',
+        avatar: '/images/search-engine/yandex.png',
         query: 'https://yandex.com/search/?text=',
+    },
+    {
+        id: 5,
+        name: 'Baidu',
+        avatar: '/images/search-engine/baidu.ico',
+        query: 'https://www.baidu.com/s?wd=',
     },
 ]
 
