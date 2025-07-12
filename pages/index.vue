@@ -126,7 +126,7 @@
 </template>
 <script setup lang="ts">
 import { Menu, MenuButton, MenuItem, MenuItems, Dialog, DialogPanel,  TransitionRoot, TransitionChild } from '@headlessui/vue'
-import { EllipsisHorizontalIcon, XMarkIcon } from '@heroicons/vue/20/solid'
+import { EllipsisHorizontalIcon } from '@heroicons/vue/20/solid'
 
 const { loggedIn } = useUserSession()
 
