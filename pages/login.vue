@@ -2,8 +2,7 @@
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <a href="/">{{ config.public.appName }}</a>
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Login in to your account</h2>
+      <h1 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Login in to your account</h1>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
