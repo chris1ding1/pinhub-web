@@ -18,6 +18,7 @@
                     <img
                         v-if="pin.image_url"
                         :src="pin.image_url"
+                        @click="openImageModal(pin.image_url)"
                         class="rounded-lg aspect-10/7 object-cover group-hover:opacity-75"
                     >
                     <p
@@ -43,8 +44,9 @@
                     </a>
                 </div>
             </li>
-        </ul>
+                </ul>
             </div>
+            <PinsAppImageModal :is-open="isImageModalOpen" :image-url="modalImageUrl" @close="closeImageModal" />
         </main>
     </div>
 </template>
@@ -79,5 +81,11 @@ getPinsIndex()
 
 const isImageOnly = (pin: any) => {
   return pin.image_url && !pin.content && !pin.url
+}
+
+const { isOpen: isImageModalOpen, imageUrl: modalImageUrl, openModal, closeModal: closeImageModal } = usePinImageModal()
+
+const openImageModal = (imageUrl: string) => {
+  openModal(imageUrl)
 }
 </script>
