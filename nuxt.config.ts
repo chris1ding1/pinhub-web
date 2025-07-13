@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxtjs/i18n', 'nuxt-auth-utils'],
+  modules: ['@nuxt/eslint', '@nuxtjs/i18n', 'nuxt-auth-utils', '@nuxt/icon'],
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [
@@ -13,6 +13,14 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
+  },
+  icon: {
+    customCollections: [
+      {
+        prefix: 'app-icons',
+        dir: './assets/app-icons',
+      },
+    ],
   },
   runtimeConfig: {
     public: {
