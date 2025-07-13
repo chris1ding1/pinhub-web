@@ -89,7 +89,7 @@
                 </div>
             </li>
         </ul>
-        <AppToolbar @pin-created="handlePinCreated" />
+        <AppToolbar v-if="loggedIn" @pin-created="handlePinCreated" />
         <PinsAppImageModal :is-open="isImageModalOpen" :image-url="modalImageUrl" @close="closeImageModal" />
     </main>
   </div>
