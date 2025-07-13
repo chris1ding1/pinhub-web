@@ -1,6 +1,11 @@
 <template>
-  <header class="bg-white">
+  <header class="bg-white py-5">
     <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <div class="flex flex-1">
+        <a href="/" class="">
+            <span class="self-center text-2xl font-semibold whitespace-nowrap">{{ config.public.appName }}</span>
+        </a>
+      </div>
       <div class="flex flex-1 justify-end">
         <div v-if="isShowLogin" >
           <a href="/login" class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900">Log in <span aria-hidden="true">&rarr;</span></a>
@@ -15,6 +20,7 @@
 </template>
 <script setup lang="ts">
 const { loggedIn, user, clear: clearSession } = useUserSession()
+const config = useRuntimeConfig()
 const route = useRoute()
 
 const isShowLogin = computed(() => {
