@@ -82,7 +82,7 @@
                         :title="pin.url"
                         target="_blank"
                         rel="nofollow noopener"
-                        class="block truncate text-sm text-gray-500"
+                        class="inline-block truncate text-sm text-gray-500 max-w-full"
                     >
                         {{ pin.url_host }}
                     </a>
