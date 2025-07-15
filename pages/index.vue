@@ -23,7 +23,6 @@
       </div>
     </header>
     <main>
-        <PinsAppCreateModal v-if="loggedIn" @pin-created="handlePinCreated"/>
         <ul v-if="userPins?.data?.items?.length" role="list" class="columns-2 sm:columns-3 lg:columns-4 gap-x-6 xl:gap-x-8 mt-10 mb-30">
             <li
                 v-for="pin in userPins.data.items"
