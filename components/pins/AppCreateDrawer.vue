@@ -9,7 +9,7 @@
             <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
               <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700" enter-from="translate-x-full" enter-to="translate-x-0" leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0" leave-to="translate-x-full">
                 <DialogPanel class="pointer-events-auto w-screen max-w-md">
-                  <form class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <form class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl" method="POST">
                     <div class="h-0 flex-1 overflow-y-auto">
                       <div class="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div class="flex items-center justify-between">
@@ -63,19 +63,42 @@
                               <div class="mt-2 space-y-4">
                                 <div class="relative flex items-start">
                                   <div class="absolute flex h-6 items-center">
-                                    <input id="privacy-public" name="privacy" value="public" type="radio" checked="" class="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden" />
+                                    <input
+                                        :id="PinVisibilityPublic.id"
+                                        :value="PinVisibilityPublic.val"
+                                        type="radio"
+                                        name="visibility"
+                                        checked
+                                        class="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                                    >
                                   </div>
                                   <div class="pl-7 text-sm/6">
-                                    <label for="privacy-public" class="font-medium text-gray-900">Public</label>
+                                    <label
+                                        :for="PinVisibilityPublic.id"
+                                        class="font-medium text-gray-900"
+                                    >
+                                        {{ PinVisibilityPublic.title }}
+                                    </label>
                                   </div>
                                 </div>
                                 <div>
                                   <div class="relative flex items-start">
                                     <div class="absolute flex h-6 items-center">
-                                      <input id="privacy-private" name="privacy" value="private" type="radio" class="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden" />
+                                      <input
+                                        :id="PinVisibilityPrivate.id"
+                                        :value="PinVisibilityPrivate.val"
+                                        type="radio"
+                                        name="visibility"
+                                        class="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                                    >
                                     </div>
                                     <div class="pl-7 text-sm/6">
-                                      <label for="privacy-private" class="font-medium text-gray-900">Private</label>
+                                      <label
+                                        :for="PinVisibilityPrivate.id"
+                                        class="font-medium text-gray-900"
+                                      >
+                                        {{ PinVisibilityPrivate.title }}
+                                      </label>
                                     </div>
                                   </div>
                                 </div>
@@ -87,7 +110,7 @@
                     </div>
                     <div class="flex shrink-0 justify-end px-4 py-4">
                       <button type="button" class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50" @click="closeModal">Cancel</button>
-                      <button type="submit" class="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+                      <button type="button" class="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
                     </div>
                   </form>
                 </DialogPanel>
