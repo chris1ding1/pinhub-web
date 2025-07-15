@@ -1,31 +1,20 @@
 import * as v from 'valibot';
 
-export enum PinType {
-  URL = "url",
-  TEXT = "text",
-  AUDIO = "audio",
-  IMAGE = "image"
-}
-
 export enum PinVisibility {
   PRIVATE = 1,
   PUBLIC = 2
 }
 
-export interface Pin {
-  uid: string;
-  type: PinType;
-  content?: string;
-  url?: string;
-  tags: string[];
-  metadata: Record<string, unknown>;
-  visibility?: PinVisibility;
-}
-
-export interface CreatePinData {
-  url: string;
-  content: string;
-  visibility: PinVisibility;
+export interface PinResponse {
+    id: string;
+    content: string | null;
+    url: string | null;
+    audio_path: string | null;
+    image_path: string | null;
+    audio_url: string | null;
+    image_url: string | null;
+    url_host: string | null;
+    visibility: PinVisibility;
 }
 
 export interface PinForm {
@@ -71,7 +60,7 @@ export const ValidatorPinImageSchema = v.pipe(
     v.maxSize(PinImageMaxSize, 'Please select a file smaller than 5 MB.')
 )
 
-type ValidationPinErrorDetails = {
+export type ValidationPinErrorDetails = {
     [K in keyof PinForm]: string[];
 };
 
@@ -85,36 +74,48 @@ export const ValidatorPinFormSchema = v.pipe(
       url: v.optional(
         v.pipe(
           v.string(),
-          v.nonEmpty(),
-          v.url(),
-          v.maxLength(2048)
+          v.maxLength(2048, 'URL must be less than 2048 characters'),
+          v.union([
+            v.literal(''),
+            v.pipe(v.string(), v.url('Please enter a valid URL'))
+          ])
         ),
       ),
       content: v.optional(
         v.pipe(
           v.string(),
-          v.nonEmpty(),
-          v.maxLength(3000),
+          v.maxLength(3000, 'Content must be less than 3000 characters'),
         ),
       ),
       audio_path: v.optional(
         v.pipe(
           v.string(),
-          v.nonEmpty(),
         ),
       ),
       image_path: v.optional(
         v.pipe(
           v.string(),
-          v.nonEmpty(),
         ),
       ),
       visibility: v.pipe(
-        v.picklist([PinVisibility.PRIVATE, PinVisibility.PUBLIC]),
+        v.picklist([PinVisibility.PRIVATE, PinVisibility.PUBLIC], 'Please select a valid visibility option'),
       ),
     }),
     v.check(
       (input) => Boolean(input.url || input.content || input.audio_path || input.image_path),
-      'Please enter either a URL, Content, or upload an image or audio.'
+      'Please enter either a URL, Content, or upload an image or Record.'
     )
   );
+
+export const createPin = async (pinForm: PinForm): Promise<ApiResponse<PinResponse> | false> => {
+    try {
+        const response = await useNuxtApp().$api<ApiResponse<PinResponse>>('/pins', {
+            method: 'POST',
+            body: pinForm,
+        })
+        return response
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
