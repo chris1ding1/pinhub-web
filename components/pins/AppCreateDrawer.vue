@@ -78,8 +78,9 @@
                             <div>
                                 <label for="record-btn" class="block text-sm/6 font-medium text-gray-900">Record</label>
                                 <div class="mt-2">
-                                    <button id="record-btn" type="button">
-                                        <MicrophoneIcon class="mx-auto size-6" aria-hidden="true" />
+                                    <button id="record-btn" type="button" class="inline-flex items-center gap-x-1.5">
+                                        <MicrophoneIcon class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
+                                        {{ asyncStates.isRecording ? 'Stop Recording' : 'Start Recording' }}
                                     </button>
                                     <div
                                       v-if="errors.details.audio_path.length > 0"
