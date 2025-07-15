@@ -16,16 +16,27 @@
                     @change="handleImage"
                 >
             </button>
+            <button
+                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center"
+                @click="openPinsCreateDrawer"
+            >
+                <PlusIcon class="w-6 h-6" />
+            </button>
         </div>
-    </div>
-    <div>
-        <div id="tooltip-image" role="tooltip" class="absolute z-20 invisible inline-block px-1 py-1 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-md opacity-0 tooltip">
-           Image
+        <div>
+            <div id="tooltip-image" role="tooltip" class="absolute z-20 invisible inline-block px-1 py-1 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-md opacity-0 tooltip">
+            Image
+            </div>
         </div>
+        <PinsAppCreateDrawer ref="pinsCreateDrawerRef" />
     </div>
 </template>
 <script setup lang="js">
 import { useFlowbite } from '~/composables/useFlowbite';
+import { PlusIcon } from '@heroicons/vue/24/outline'
+
+const pinsCreateDrawerRef = ref(null)
+
 onMounted(() => {
     useFlowbite(() => {
         initTooltips();
@@ -65,5 +76,9 @@ const handleImage = async(e) => {
     alert(error)
     return false
   }
+}
+
+const openPinsCreateDrawer = () => {
+  pinsCreateDrawerRef.value?.openModal()
 }
 </script>
