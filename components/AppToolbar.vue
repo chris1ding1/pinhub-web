@@ -24,8 +24,8 @@
             </button>
         </div>
         <div>
-            <div id="tooltip-image" role="tooltip" class="absolute z-20 invisible inline-block px-1 py-1 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-md opacity-0 tooltip">
-            Image
+            <div id="tooltip-image" role="tooltip" class="absolute z-20 invisible inline-block px-3 py-2 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-md opacity-0 tooltip min-w-max text-center">
+            Image (PNG, JPG up to 5MB)
             </div>
         </div>
         <PinsAppCreateDrawer ref="pinsCreateDrawerRef" />
