@@ -10,9 +10,6 @@
               <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700" enter-from="translate-x-full" enter-to="translate-x-0" leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0" leave-to="translate-x-full">
                 <DialogPanel class="pointer-events-auto w-screen max-w-md">
                   <form class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl" method="POST">
-                    <div>
-                        <p v-if="errors.message" class="mt-2 text-sm text-red-600">{{ errors.message }}</p>
-                    </div>
                     <div class="h-0 flex-1 overflow-y-auto">
                       <div class="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div class="flex items-center justify-between">
@@ -36,6 +33,9 @@
                       <div class="flex flex-1 flex-col justify-between">
                         <div class="divide-y divide-gray-200 px-4 sm:px-6">
                           <div class="space-y-6 pt-6 pb-5">
+                            <div v-if="errors.message">
+                              <p class="mt-2 text-sm text-red-600">{{ errors.message }}</p>
+                            </div>
                             <div>
                               <label for="url" class="block text-sm/6 font-medium text-gray-900">URL</label>
                               <div class="mt-2">
@@ -45,7 +45,15 @@
                                   type="url"
                                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm/6" maxlength="2048"
                                 >
-                                <p class="mt-2 text-sm text-red-600"></p>
+                                <div
+                                  v-if="errors.details.url.length > 0"
+                                  class="mt-2 text-sm text-red-600">
+                                  <ul class="list-disc">
+                                    <li v-for="error in errors.details.url" :key="error">
+                                      {{ error }}
+                                    </li>
+                                  </ul>
+                                </div>
                               </div>
                             </div>
                             <div>
@@ -56,7 +64,15 @@
                                   id="content"
                                   rows="3"
                                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm/6" maxlength="3000" />
-                                <p class="mt-2 text-sm text-red-600"></p>
+                                <div
+                                  v-if="errors.details.content.length > 0"
+                                  class="mt-2 text-sm text-red-600">
+                                  <ul class="list-disc">
+                                    <li v-for="error in errors.details.content" :key="error">
+                                      {{ error }}
+                                    </li>
+                                  </ul>
+                                </div>
                               </div>
                             </div>
                             <div>
@@ -65,6 +81,15 @@
                                     <button id="record-btn" type="button">
                                         <MicrophoneIcon class="mx-auto size-6" aria-hidden="true" />
                                     </button>
+                                    <div
+                                      v-if="errors.details.audio_path.length > 0"
+                                      class="mt-2 text-sm text-red-600">
+                                      <ul class="list-disc">
+                                       <li v-for="error in errors.details.audio_path" :key="error">
+                                          {{ error }}
+                                        </li>
+                                      </ul>
+                                    </div>
                                     <input v-model="pinForm.audio_path" type="hidden">
                                 </div>
                             </div>
@@ -75,14 +100,11 @@
                                   id="upload-image"
                                   ref="imageInputRef"
                                   @change="handleImageSelect"
-                                  :class="[
-                                    'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none',
-                                    isImageUploading ? 'cursor-progress' : 'cursor-pointer'
-                                  ]"
+                                  :class="imageInputState.classes"
                                   aria-describedby="upload-image-help"
                                   type="file"
                                   accept="image/png, image/jpeg"
-                                  :disabled="isImageUploading"
+                                  :disabled="imageInputState.isDisabled"
                                 >
                                 <p id="upload-image-help" class="mt-1 text-xs/5 text-gray-500">PNG, JPG up to 5MB</p>
                                 <div
@@ -95,7 +117,7 @@
                                   </ul>
                                 </div>
                                 <div v-if="imageRawName" class="mt-2 flex items-start justify-between">
-                                    <span class="text-sm font-medium text-gray-600 truncate">
+                                    <span class="text-sm font-medium text-gray-900 truncate">
                                         {{ imageRawName }}
                                     </span>
                                     <div class="ml-3 flex h-7 items-center">
@@ -159,6 +181,15 @@
                                     </div>
                                   </div>
                                 </div>
+                                <div
+                                  v-if="errors.details.visibility.length > 0"
+                                  class="mt-2 text-sm text-red-600">
+                                  <ul class="list-disc">
+                                    <li v-for="error in errors.details.visibility" :key="error">
+                                      {{ error }}
+                                    </li>
+                                  </ul>
+                                </div>
                               </div>
                             </fieldset>
                           </div>
@@ -166,8 +197,20 @@
                       </div>
                     </div>
                     <div class="flex shrink-0 justify-end px-4 py-4">
-                      <button type="button" class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50" @click="closeModal">Cancel</button>
-                      <button type="button" class="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+                      <button
+                        type="button" class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+                        @click="closeModal"
+                      >
+                          Cancel
+                      </button>
+                      <button
+                        type="button"
+                        :disabled="createPinBtnState.isDisabled"
+                        :class="createPinBtnState.classes"
+                        @click="handleCreatePin"
+                      >
+                         {{ createPinBtnState.text }}
+                      </button>
                     </div>
                   </form>
                 </DialogPanel>
@@ -190,8 +233,20 @@ const openModal = () => {
   isOpen.value = true
 }
 
-const closeModal = () =>{
+const closeModal = () => {
   isOpen.value = false
+  clearErrors()
+  clearImage()
+
+  asyncStates.isImageUploading = false
+  asyncStates.isRecording = false
+  asyncStates.isCreatingPin = false
+
+  pinForm.url = ''
+  pinForm.content = ''
+  pinForm.audio_path = ''
+  pinForm.image_path = ''
+  pinForm.visibility = PinVisibility.PRIVATE
 }
 
 defineExpose({
@@ -218,12 +273,63 @@ const errors = ref<ValidationPinErrors>({
     },
 })
 
+const asyncStates = reactive({
+  isImageUploading: false,
+  isRecording: false,
+  isCreatingPin: false,
+})
+
+const imageInputState = computed(() => {
+  const isDisabled = asyncStates.isImageUploading || asyncStates.isCreatingPin
+
+  let classes = 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none'
+  if (isDisabled === false) {
+    classes = `${classes} cursor-pointer`
+  }
+
+  if (asyncStates.isImageUploading) {
+    classes = `${classes} cursor-progress`
+  }
+
+  if (asyncStates.isCreatingPin) {
+    classes = `${classes} cursor-not-allowed`
+  }
+
+  return {
+    isDisabled,
+    classes,
+  }
+})
+
+const createPinBtnState = computed(() => {
+  const baseClasses = 'ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs'
+  const isDisabled = asyncStates.isImageUploading || asyncStates.isRecording || asyncStates.isCreatingPin
+  const text = asyncStates.isCreatingPin ? 'Saving...' : 'Save'
+
+  let classes = ''
+  if (isDisabled) {
+    const disabledBaseClasses = 'hover:bg-indigo-700 focus:outline-none disabled:bg-indigo-300 sm:w-auto dark:disabled:bg-indigo-800 '
+    if (asyncStates.isCreatingPin) {
+      classes = `${baseClasses} ${disabledBaseClasses} cursor-progress`
+    } else {
+      classes = `${baseClasses} ${disabledBaseClasses} cursor-not-allowed`
+    }
+  } else {
+    classes = `${baseClasses} hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer`
+  }
+
+  return {
+    isDisabled,
+    text,
+    classes,
+  }
+})
+
 const imageInputRef = ref<HTMLInputElement>()
 const imageRawName = ref('')
-const isImageUploading = ref(false)
 
 const handleImageSelect = async (e: Event) => {
-  if (isImageUploading.value) {
+  if (asyncStates.isImageUploading || asyncStates.isCreatingPin) {
     return
   }
 
@@ -247,21 +353,65 @@ const handleImageSelect = async (e: Event) => {
     return
   }
 
-  isImageUploading.value = true
+  asyncStates.isImageUploading = true
+  errors.value.message = ''
   try {
     const response = await pinUploadImage(file)
     if (!response || response.code !== 0 || !response.data) {
       return
     }
-    isImageUploading.value = false
+    asyncStates.isImageUploading = false
     imageRawName.value = file.name
     pinForm.image_path = response.data.path
   } catch (error) {
-    isImageUploading.value = false
+    asyncStates.isImageUploading = false
     pinForm.image_path = ''
+    errors.value.message = 'Failed to upload image, please try again.'
     console.error('Upload error:', error)
   } finally {
-    isImageUploading.value = false
+    asyncStates.isImageUploading = false
+  }
+}
+
+const handleCreatePin = async () => {
+  clearErrors()
+  try {
+    v.parse(ValidatorPinFormSchema, pinForm)
+  } catch (error) {
+    if (error instanceof v.ValiError) {
+      const flatErrors = v.flatten(error.issues)
+      if (flatErrors.root && flatErrors.root.length > 0) {
+        errors.value.message = flatErrors.root[0]
+      }
+      if (flatErrors.nested) {
+        Object.keys(flatErrors.nested).forEach(key => {
+          const fieldKey = key as keyof ValidationPinErrorDetails
+          if (flatErrors.nested && flatErrors.nested[fieldKey]) {
+            errors.value.details[fieldKey] = flatErrors.nested[fieldKey] as string[]
+          }
+        })
+      }
+    } else {
+        errors.value.message = 'An unknown error occurred.'
+    }
+    return
+  }
+
+  asyncStates.isCreatingPin = true
+  await new Promise(resolve => setTimeout(resolve, 10000))
+  try {
+    const response = await createPin(pinForm)
+    if (!response || response.code !== 0 || !response.data) {
+      errors.value.message = 'Failed to create pin. Please try again.'
+      return
+    }
+    closeModal()
+  } catch (error) {
+    asyncStates.isCreatingPin = false
+    errors.value.message = 'Failed to create pin. Please try again.'
+    console.error('Upload error:', error)
+  } finally {
+    asyncStates.isCreatingPin = false
   }
 }
 
@@ -270,6 +420,17 @@ const clearImage = () => {
   imageRawName.value = ''
   if (imageInputRef.value) {
     imageInputRef.value.value = ''
+  }
+}
+
+const clearErrors = () => {
+  errors.value.message = ''
+  errors.value.details = {
+    url: [],
+    content: [],
+    audio_path: [],
+    image_path: [],
+    visibility: [],
   }
 }
 </script>
