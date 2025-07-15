@@ -398,7 +398,6 @@ const handleCreatePin = async () => {
   }
 
   asyncStates.isCreatingPin = true
-  await new Promise(resolve => setTimeout(resolve, 10000))
   try {
     const response = await createPin(pinForm)
     if (!response || response.code !== 0 || !response.data) {
