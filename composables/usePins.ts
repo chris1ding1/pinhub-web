@@ -25,3 +25,15 @@ export interface CreatePinData {
   content: string;
   visibility: PinVisibility;
 }
+
+export const PinVisibilityPublic = {
+    id: "visibility-public",
+    title: 'Public',
+    val: PinVisibility.PUBLIC
+}
+
+export const PinVisibilityPrivate = {
+    id: "visibility-private",
+    title: 'Private',
+    val: PinVisibility.PRIVATE
+}
