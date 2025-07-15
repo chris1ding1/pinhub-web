@@ -122,10 +122,12 @@
                                     </span>
                                     <div class="ml-3 flex h-7 items-center">
                                         <button
-                                        type="button"
-                                        @click="clearImage"
-                                        class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-hidden"
-                                    >
+                                          v-if="!asyncStates.isCreatingPin"
+                                          type="button"
+                                          :disabled="asyncStates.isCreatingPin"
+                                          @click="clearImage"
+                                          class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                                        >
                                           <span class="absolute -inset-2.5" />
                                           <span class="sr-only">Clear image</span>
                                           <XMarkIcon class="size-5" aria-hidden="true" />
@@ -398,6 +400,7 @@ const handleCreatePin = async () => {
   }
 
   asyncStates.isCreatingPin = true
+
   try {
     const response = await createPin(pinForm)
     if (!response || response.code !== 0 || !response.data) {
