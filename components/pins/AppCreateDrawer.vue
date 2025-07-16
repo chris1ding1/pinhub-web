@@ -88,9 +88,9 @@
                                       ]"
                                       @click="toggleRecording"
                                     >
-                                        <div v-if="asyncStates.isRecording" class="inline-flex items-center gap-x-1.5">
-                                            <StopIcon class="mx-auto size-4 -ml-0.5 text-red-700" aria-hidden="true" />
-                                            <div class="flex gap-0.5">
+                                        <div v-if="asyncStates.isRecording" class="inline-flex items-center justify-center gap-x-1.5">
+                                            <StopIcon class="mx-auto size-5 -ml-0.5 flex text-red-600" aria-hidden="true" />
+                                            <div class="flex gap-0.5 w-full">
                                                 <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0ms" />
                                                 <div class="w-1 h-4 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 150ms" />
                                                 <div class="w-1 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 300ms" />
@@ -98,11 +98,14 @@
                                                 <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 600ms" />
                                             </div>
                                         </div>
-                                        <div v-else class="inline-flex items-center gap-x-1.5">
+                                        <div v-if="!asyncStates.isRecording && !asyncStates.isAudioUploading" class="inline-flex items-center justify-center gap-x-1.5">
                                             <MicrophoneIcon class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
                                             <span>
                                                 Start Recording
                                             </span>
+                                        </div>
+                                        <div v-if="asyncStates.isAudioUploading" class="mt-1">
+                                          <span>Uploading audio...</span>
                                         </div>
                                     </button>
                                     <div v-if="asyncStates.isRecording" class="mt-1 text-sm text-gray-600">
@@ -111,10 +114,10 @@
                                     <div v-if="audioPreviewUrl" class="mt-1 space-x-2">
                                         <audio :src="audioPreviewUrl" controls class="flex w-full" />
                                         <button
-                                            @click="deleteRecording"
-                                            class="inline-flex items-end justify-end text-sm text-red-600 underline mt-1"
+                                          v-if="pinForm.audio_path"
+                                          @click="deleteRecording"
+                                          class="ml-auto block mt-1 text-xs/5 text-gray-500"
                                         >
-                                          <XMarkIcon class="size-4" aria-hidden="true" />
                                           <span>Delete recording</span>
                                         </button>
                                     </div>
@@ -492,6 +495,7 @@ const startRecording = async() => {
 
   pinForm.audio_path = ""
   errors.value.details.audio_path = []
+  deleteRecording()
 
   try {
     mediaStream.value = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -509,25 +513,9 @@ const startRecording = async() => {
             mediaStream.value = null
         }
 
-        asyncStates.isAudioUploading = true
-        try {
-            const audioFile = new File([audioBlob.value], 'recording.webm', { type: 'audio/webm' })
-            const response = await pinUploadAudio(audioFile)
-            if (!response || response.code !== 0 || !response.data) {
-              errors.value.details.audio_path = ["Failed to upload audio"]
-              return
-            }
-            pinForm.audio_path = response.data.path
-            if (pinForm.content === '' && response.data.text) {
-              pinForm.content = response.data.text
-            }
-        } catch (error) {
-            errors.value.details.audio_path = ["Failed to upload audio."]
-            console.error('Failed to upload audio:', error)
-        } finally {
-            asyncStates.isAudioUploading = false
-        }
         audioPreviewUrl.value = URL.createObjectURL(audioBlob.value)
+
+        handleAudioUpload()
     }
 
     mediaRecorder.value.start()
@@ -595,6 +583,34 @@ const toggleRecording = () => {
     stopRecording()
   } else {
     startRecording()
+  }
+}
+
+const handleAudioUpload = async () => {
+  if (!audioBlob.value) { 
+    return
+  }
+
+  asyncStates.isAudioUploading = true
+
+  try {
+      const audioFile = new File([audioBlob.value], 'recording.webm', { type: 'audio/webm' })
+      const response = await pinUploadAudio(audioFile)
+      if (!response || response.code !== 0 || !response.data) {
+        errors.value.details.audio_path = ["Failed to upload audio"]
+        return
+      }
+      pinForm.audio_path = response.data.path
+      if (pinForm.content === '' && response.data.text) {
+        pinForm.content = response.data.text
+      }
+      setTimeout(() => {
+        asyncStates.isAudioUploading = false
+      }, 1500)
+  } catch (error) {
+      errors.value.details.audio_path = ["Failed to upload audio."]
+      console.error('Failed to upload audio:', error)
+      asyncStates.isAudioUploading = false
   }
 }
 </script>
