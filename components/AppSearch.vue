@@ -18,9 +18,7 @@
                                     <span v-if="selected.length > 2" class="text-xs text-gray-500">+{{ selected.length - 2 }}</span>
                                 </div>
                             </div>
-                            <ChevronUpDownIcon
-                                class="absolute right-2 top-1/2 -translate-y-1/2 size-4 text-gray-500"
-                                aria-hidden="true" />
+                            <Icon name="heroicons:chevron-up-down-16-solid" class="absolute right-2 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
                         </ListboxButton>
                         <transition leave-active-class="transition ease-in duration-100"
                             leave-from-class="opacity-100" leave-to-class="opacity-0">
@@ -46,7 +44,7 @@
 
                                         <span v-if="selected"
                                             :class="[active ? 'text-white' : 'text-indigo-600', 'absolute inset-y-0 right-0 flex items-center pr-4']">
-                                            <CheckIcon class="size-5" aria-hidden="true" />
+                                            <Icon name="heroicons:check-20-solid" class="size-5" />
                                         </span>
                                     </li>
                                 </ListboxOption>
@@ -66,8 +64,6 @@
 // ... existing script ...
 <script setup lang="ts">
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
-import { ChevronUpDownIcon } from '@heroicons/vue/16/solid'
-import { CheckIcon } from '@heroicons/vue/20/solid'
 
 const searchTypes = [
     {

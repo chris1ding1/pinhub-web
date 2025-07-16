@@ -20,7 +20,7 @@
                 class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center"
                 @click="openPinsCreateDrawer"
             >
-                <PlusIcon class="w-6 h-6" />
+              <Icon name="heroicons:plus" class="w-6 h-6" />
             </button>
         </div>
         <div>
@@ -33,7 +33,6 @@
 </template>
 <script setup lang="js">
 import { useFlowbite } from '~/composables/useFlowbite';
-import { PlusIcon } from '@heroicons/vue/24/outline'
 
 const pinsCreateDrawerRef = ref(null)
 
