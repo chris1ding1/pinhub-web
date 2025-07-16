@@ -78,10 +78,40 @@
                             <div>
                                 <label for="record-btn" class="block text-sm/6 font-medium text-gray-900">Record</label>
                                 <div class="mt-2">
-                                    <button id="record-btn" type="button" class="inline-flex items-center gap-x-1.5">
-                                        <MicrophoneIcon class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
-                                        {{ asyncStates.isRecording ? 'Stop Recording' : 'Start Recording' }}
+                                    <button
+                                      id="record-btn"
+                                      type="button"
+                                      class="inline-flex items-center gap-x-1.5"
+                                      @click="toggleRecording"
+                                    >
+                                        <div v-if="asyncStates.isRecording">
+                                            <StopIcon class="mx-auto size-5 -ml-0.5 bg-red-100 text-red-700 border border-red-300" aria-hidden="true" />
+                                            <div class="flex items-center gap-0.5">
+                                                <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0ms" />
+                                                <div class="w-1 h-4 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 150ms" />
+                                                <div class="w-1 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 300ms" />
+                                                <div class="w-1 h-5 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 450ms" />
+                                                <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 600ms" />
+                                            </div>
+                                        </div>
+                                        <MicrophoneIcon v-else class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
+                                        <span v-if="!asyncStates.isRecording">
+                                            Start Recording
+                                        </span>
                                     </button>
+                                    <div v-if="asyncStates.isRecording" class="mt-1 text-sm text-gray-600">
+                                        {{ recordingTime }}s/15s
+                                    </div>
+                                    <div v-if="audioPreviewUrl" class="mt-1">
+                                        <audio :src="audioPreviewUrl" controls class="w-full rounded shadow-sm" />
+                                        <button
+                                            @click="deleteRecording"
+                                            class="flex justify-end text-sm text-red-600 hover:text-red-700 underline"
+                                        >
+                                          <XMarkIcon class="size-4" aria-hidden="true" />
+                                          Delete recording
+                                        </button>
+                                    </div>
                                     <div
                                       v-if="errors.details.audio_path.length > 0"
                                       class="mt-2 text-sm text-red-600">
@@ -229,6 +259,7 @@
 import * as v from 'valibot';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XMarkIcon, MicrophoneIcon } from '@heroicons/vue/24/outline'
+import { StopIcon } from '@heroicons/vue/24/solid'
 
 const isOpen = ref(false)
 
@@ -240,10 +271,12 @@ const closeModal = () => {
   isOpen.value = false
   clearErrors()
   clearImage()
+  deleteRecording()
 
   asyncStates.isImageUploading = false
   asyncStates.isRecording = false
   asyncStates.isCreatingPin = false
+  asyncStates.isAudioUploading = false
 
   pinForm.url = ''
   pinForm.content = ''
@@ -279,8 +312,17 @@ const errors = ref<ValidationPinErrors>({
 const asyncStates = reactive({
   isImageUploading: false,
   isRecording: false,
+  isAudioUploading: false,
   isCreatingPin: false,
 })
+
+const recordingTime = ref(0)
+const mediaStream = ref<MediaStream | null>(null)
+const mediaRecorder = ref<MediaRecorder | null>(null)
+const audioChunks = ref<Blob[]>([])
+const audioPreviewUrl = ref<string | null>(null)
+const audioBlob = ref<Blob | null>(null)
+let recordingTimerId: NodeJS.Timeout | null = null
 
 const imageInputState = computed(() => {
   const isDisabled = asyncStates.isImageUploading || asyncStates.isCreatingPin
@@ -306,7 +348,7 @@ const imageInputState = computed(() => {
 
 const createPinBtnState = computed(() => {
   const baseClasses = 'ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs'
-  const isDisabled = asyncStates.isImageUploading || asyncStates.isRecording || asyncStates.isCreatingPin
+  const isDisabled = asyncStates.isImageUploading || asyncStates.isRecording || asyncStates.isCreatingPin || asyncStates.isAudioUploading
   const text = asyncStates.isCreatingPin ? 'Saving...' : 'Save'
 
   let classes = ''
@@ -434,6 +476,119 @@ const clearErrors = () => {
     audio_path: [],
     image_path: [],
     visibility: [],
+  }
+}
+
+const startRecording = async() => {
+  if (asyncStates.isAudioUploading  || asyncStates.isRecording) {
+    return
+  }
+
+  pinForm.audio_path = ""
+  errors.value.details.audio_path = []
+
+  try {
+    mediaStream.value = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder.value = new MediaRecorder(mediaStream.value)
+
+    audioChunks.value = []
+    mediaRecorder.value.ondataavailable = (e) => {
+      audioChunks.value.push(e.data)
+    }
+
+    mediaRecorder.value.onstop = async() => {
+        audioBlob.value = new Blob(audioChunks.value, { type: "audio/webm" })
+        if (mediaStream.value) {
+            mediaStream.value.getTracks().forEach(track => track.stop())
+            mediaStream.value = null
+        }
+
+        asyncStates.isAudioUploading = true
+        try {
+            const audioFile = new File([audioBlob.value], 'recording.webm', { type: 'audio/webm' })
+            const response = await pinUploadAudio(audioFile)
+            if (!response || response.code !== 0 || !response.data) {
+              errors.value.details.audio_path = ["Failed to upload audio"]
+              return
+            }
+            pinForm.audio_path = response.data.path
+            if (pinForm.content === '' && response.data.text) {
+              pinForm.content = response.data.text
+            }
+        } catch (error) {
+            errors.value.details.audio_path = ["Failed to upload audio."]
+            console.error('Failed to upload audio:', error)
+        } finally {
+            asyncStates.isAudioUploading = false
+        }
+        audioPreviewUrl.value = URL.createObjectURL(audioBlob.value)
+    }
+
+    mediaRecorder.value.start()
+    asyncStates.isRecording = true
+
+    recordingTime.value = 0
+    recordingTimerId = setInterval(() => {
+        recordingTime.value++
+        if (recordingTime.value >= 15) {
+            stopRecording()
+        }
+    }, 1000)
+  } catch (error) {
+    asyncStates.isRecording = false
+    errors.value.details.audio_path = ["Failed to start recording."]
+    console.error('Failed to start recording:', error)
+  }
+}
+
+const stopRecording = () => {
+  if (mediaRecorder.value && mediaRecorder.value.state !== 'inactive') {
+    mediaRecorder.value.stop()
+  }
+  asyncStates.isRecording = false
+  if (recordingTimerId) {
+    clearInterval(recordingTimerId)
+    recordingTimerId = null
+  }
+}
+
+const deleteRecording = () => {
+  if (audioPreviewUrl.value) {
+    URL.revokeObjectURL(audioPreviewUrl.value)
+  }
+
+  recordingTime.value = 0
+  audioPreviewUrl.value = null
+  pinForm.audio_path = ""
+  errors.value.details.audio_path = []
+
+  if (audioBlob.value) {
+    audioBlob.value = null
+  }
+  if (mediaRecorder.value && mediaRecorder.value.state !== 'inactive') {
+    mediaRecorder.value.stop()
+  }
+  if (mediaStream.value) {
+    mediaStream.value.getTracks().forEach(track => track.stop())
+    mediaStream.value = null
+  }
+  asyncStates.isRecording = false
+  asyncStates.isAudioUploading = false
+  if (recordingTimerId) {
+    clearInterval(recordingTimerId)
+    recordingTimerId = null
+  }
+}
+
+const toggleRecording = () => {
+  if (asyncStates.isAudioUploading) {
+    return
+  }
+
+  if (asyncStates.isRecording) {
+    stopRecording()
+  } else {
+    startRecording()
   }
 }
 </script>
