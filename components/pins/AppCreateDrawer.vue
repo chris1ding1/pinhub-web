@@ -597,6 +597,7 @@ const handleAudioUpload = async () => {
       const response = await pinUploadAudio(audioFile)
       if (!response || response.code !== 0 || !response.data) {
         errors.value.details.audio_path = ["Failed to upload audio"]
+        asyncStates.isAudioUploading = false
         return
       }
       pinForm.audio_path = response.data.path
