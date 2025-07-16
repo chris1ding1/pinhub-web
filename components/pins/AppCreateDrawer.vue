@@ -81,12 +81,16 @@
                                     <button
                                       id="record-btn"
                                       type="button"
-                                      class="inline-flex items-center gap-x-1.5"
+                                      :disabled="asyncStates.isAudioUploading"
+                                      :class="[
+                                        'rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 w-full items-center',
+                                        asyncStates.isAudioUploading ? 'cursor-progress' : ''
+                                      ]"
                                       @click="toggleRecording"
                                     >
-                                        <div v-if="asyncStates.isRecording">
-                                            <StopIcon class="mx-auto size-5 -ml-0.5 bg-red-100 text-red-700 border border-red-300" aria-hidden="true" />
-                                            <div class="flex items-center gap-0.5">
+                                        <div v-if="asyncStates.isRecording" class="inline-flex items-center gap-x-1.5">
+                                            <StopIcon class="mx-auto size-5 -ml-0.5 text-red-700" aria-hidden="true" />
+                                            <div class="flex gap-0.5">
                                                 <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0ms" />
                                                 <div class="w-1 h-4 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 150ms" />
                                                 <div class="w-1 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 300ms" />
@@ -94,10 +98,12 @@
                                                 <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 600ms" />
                                             </div>
                                         </div>
-                                        <MicrophoneIcon v-else class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
-                                        <span v-if="!asyncStates.isRecording">
-                                            Start Recording
-                                        </span>
+                                        <div v-else class="inline-flex items-center gap-x-1.5">
+                                            <MicrophoneIcon class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
+                                            <span>
+                                                Start Recording
+                                            </span>
+                                        </div>
                                     </button>
                                     <div v-if="asyncStates.isRecording" class="mt-1 text-sm text-gray-600">
                                         {{ recordingTime }}s/15s
@@ -106,7 +112,7 @@
                                         <audio :src="audioPreviewUrl" controls class="w-full rounded shadow-sm" />
                                         <button
                                             @click="deleteRecording"
-                                            class="flex justify-end text-sm text-red-600 hover:text-red-700 underline"
+                                            class="flex justify-end text-sm text-red-600 underline"
                                         >
                                           <XMarkIcon class="size-4" aria-hidden="true" />
                                           Delete recording
