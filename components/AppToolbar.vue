@@ -28,7 +28,7 @@
             Image (PNG, JPG up to 5MB)
             </div>
         </div>
-        <PinsAppCreateDrawer ref="pinsCreateDrawerRef" />
+        <PinsAppCreateDrawer ref="pinsCreateDrawerRef" @pin-created="handlePinCreated" />
     </div>
 </template>
 <script setup lang="js">
@@ -76,6 +76,10 @@ const handleImage = async(e) => {
     alert(error)
     return false
   }
+}
+
+const handlePinCreated = (newPin) => {
+  emit('pinCreated', newPin)
 }
 
 const openPinsCreateDrawer = () => {

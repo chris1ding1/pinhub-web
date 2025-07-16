@@ -423,6 +423,8 @@ const handleImageSelect = async (e: Event) => {
   }
 }
 
+const emit = defineEmits(['pinCreated'])
+
 const handleCreatePin = async () => {
   clearErrors()
   try {
@@ -455,6 +457,7 @@ const handleCreatePin = async () => {
       errors.value.message = 'Failed to create pin. Please try again.'
       return
     }
+    emit('pinCreated', response.data)
     closeModal()
   } catch (error) {
     asyncStates.isCreatingPin = false
