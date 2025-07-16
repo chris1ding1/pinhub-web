@@ -89,7 +89,7 @@
                                       @click="toggleRecording"
                                     >
                                         <div v-if="asyncStates.isRecording" class="inline-flex items-center gap-x-1.5">
-                                            <StopIcon class="mx-auto size-5 -ml-0.5 text-red-700" aria-hidden="true" />
+                                            <StopIcon class="mx-auto size-4 -ml-0.5 text-red-700" aria-hidden="true" />
                                             <div class="flex gap-0.5">
                                                 <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0ms" />
                                                 <div class="w-1 h-4 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 150ms" />
@@ -108,14 +108,14 @@
                                     <div v-if="asyncStates.isRecording" class="mt-1 text-sm text-gray-600">
                                         {{ recordingTime }}s/15s
                                     </div>
-                                    <div v-if="audioPreviewUrl" class="mt-1">
-                                        <audio :src="audioPreviewUrl" controls class="w-full rounded shadow-sm" />
+                                    <div v-if="audioPreviewUrl" class="mt-1 space-x-2">
+                                        <audio :src="audioPreviewUrl" controls class="flex w-full" />
                                         <button
                                             @click="deleteRecording"
-                                            class="flex justify-end text-sm text-red-600 underline"
+                                            class="inline-flex items-end justify-end text-sm text-red-600 underline mt-1"
                                         >
                                           <XMarkIcon class="size-4" aria-hidden="true" />
-                                          Delete recording
+                                          <span>Delete recording</span>
                                         </button>
                                     </div>
                                     <div
