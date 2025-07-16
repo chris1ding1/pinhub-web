@@ -54,6 +54,21 @@ export const pinUploadImage = async (file: File): Promise<FileUploadResponse | f
     }
 }
 
+export const pinUploadAudio = async (file: File): Promise<FileUploadResponse | false> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const response = await useNuxtApp().$api<FileUploadResponse>('/pins/upload-audio', {
+            method: 'POST',
+            body: formData,
+        })
+        return response
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 export const ValidatorPinImageSchema = v.pipe(
     v.file(),
     v.mimeType(['image/jpeg', 'image/png'], 'Please select a JPEG or PNG file.'),
