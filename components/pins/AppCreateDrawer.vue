@@ -89,14 +89,10 @@
                                       @click="toggleRecording"
                                     >
                                         <div v-if="asyncStates.isRecording" class="inline-flex items-center justify-center gap-x-1.5">
-                                            <StopIcon class="mx-auto size-5 -ml-0.5 flex text-red-600" aria-hidden="true" />
-                                            <div class="flex gap-0.5 w-full">
-                                                <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 0ms" />
-                                                <div class="w-1 h-4 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 150ms" />
-                                                <div class="w-1 h-2 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 300ms" />
-                                                <div class="w-1 h-5 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 450ms" />
-                                                <div class="w-1 h-3 bg-gray-500 rounded-full animate-pulse" style="animation-delay: 600ms" />
-                                            </div>
+                                            <StopIcon class="mx-auto size-5 -ml-0.5 animate-pulse text-red-600" aria-hidden="true" />
+                                            <span>
+                                                Stop Recording
+                                            </span>
                                         </div>
                                         <div v-if="!asyncStates.isRecording && !asyncStates.isAudioUploading" class="inline-flex items-center justify-center gap-x-1.5">
                                             <MicrophoneIcon class="mx-auto size-5 -ml-0.5" aria-hidden="true" />
