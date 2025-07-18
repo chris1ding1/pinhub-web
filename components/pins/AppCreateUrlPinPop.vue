@@ -55,7 +55,8 @@ const { floatingStyles, placement, update } = useFloating(
   floatingEl,
   {
     middleware: [offset(10), flip(), shift()],
-    whileElementsMounted: autoUpdate
+    whileElementsMounted: autoUpdate,
+    strategy: 'fixed'
   }
 )
 
@@ -65,7 +66,7 @@ watch(
     if (open) {
       await nextTick()
       update()
-      inputRef.value?.focus()
+      inputRef.value.focus()
     } else {
       url.value = ''
     }

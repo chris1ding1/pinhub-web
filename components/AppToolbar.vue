@@ -46,6 +46,7 @@
 </template>
 <script setup lang="ts">
 import { useFlowbite } from '~/composables/useFlowbite';
+import { initTooltips } from 'flowbite';
 
 const isUrlPopOpen = ref(false)
 const urlBtnRef = ref(null)
@@ -94,6 +95,10 @@ const handleImage = async(e) => {
 
 const handlePinCreated = (newPin) => {
   emit('pinCreated', newPin)
+}
+
+const openPinsCreateDrawer = () => {
+  pinsCreateDrawerRef.value?.openModal()
 }
 
 const toggleUrlPop = () => {
