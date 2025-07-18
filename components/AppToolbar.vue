@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-auto max-w-7xl p-3 rounded-2xl bg-white shadow-md left-1/2 fixed bottom-10 justify-center items-center z-20">
+    <div class="mx-auto max-w-7xl p-3 rounded-2xl bg-white/50 shadow-md left-1/2 fixed bottom-10 justify-center items-center z-20 backdrop-blur-md">
         <div class="flex items-center space-x-1">
             <button
                 @click="triggerImage"
