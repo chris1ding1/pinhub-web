@@ -46,7 +46,7 @@ const emit = defineEmits(['pin-created', 'close'])
 
 const url = ref('')
 const floatingEl = ref(null)
-const inputRef = ref(null)
+const inputRef = ref<HTMLInputElement | null>(null)
 
 const referenceEl = computed(() => props.referenceEl || undefined)
 
@@ -66,7 +66,7 @@ watch(
     if (open) {
       await nextTick()
       update()
-      inputRef.value.focus()
+      inputRef.value?.focus()
     } else {
       url.value = ''
     }

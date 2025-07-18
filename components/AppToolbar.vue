@@ -60,28 +60,31 @@ onMounted(() => {
 
 const emit = defineEmits(['pinCreated'])
 
-const imageInput = ref(null)
+const imageInput = ref<HTMLInputElement | null>(null)
 const triggerImage = () => {
+  if (imageInput.value) {
     imageInput.value.click()
+  }
 }
 
-const handleImage = async(e) => {
-  const file = e.target.files?.[0]
+const handleImage = async(e: Event) => {
+  const eTarget = e.target as HTMLInputElement
+  const file = eTarget.files?.[0]
 
   if (!file) {
     return
   }
+
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    const response = await useNuxtApp().$api('/pins/image', {
+    const response = await useNuxtApp().$api<ApiResponse<PinResponse>>('/pins/image', {
       method: 'POST',
       body: formData,
     })
 
     if (response.code !== 0) {
-      alert(error)
       return false
     }
     if (response.data) {
