@@ -134,3 +134,16 @@ export const createPin = async (pinForm: PinForm): Promise<ApiResponse<PinRespon
         return false
     }
 }
+
+export const creatUrlPin = async (pinForm: PinForm): Promise<ApiResponse<PinResponse> | false> => {
+  try {
+      const response = await useNuxtApp().$api<ApiResponse<PinResponse>>('/pins', {
+          method: 'POST',
+          body: pinForm,
+      })
+      return response
+  } catch (error) {
+      console.log(error)
+      return false
+  }
+}
