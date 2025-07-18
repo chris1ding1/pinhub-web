@@ -132,7 +132,7 @@ const deletePin = async (pinId: string) => {
     return
   }
   try {
-    const response = await useNuxtApp().$api(`/pins/${pinId}`, {
+    const response = await useNuxtApp().$api<ApiResponse>(`/pins/${pinId}`, {
         method: 'DELETE',
     })
     if (response.code !== 0) {
@@ -140,6 +140,7 @@ const deletePin = async (pinId: string) => {
     }
     userPins.value.data.items = userPins.value.data.items.filter(pin => pin.id !== pinId)
   } catch (error) {
+    console.log('Delete pin error: ',error)
     return false
   } finally {
     deletingPins.value.delete(pinId)
