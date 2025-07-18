@@ -23,7 +23,9 @@
               <Icon name="app-icons:plus" class="w-6 h-6" />
             </button>
             <button
+                ref="urlBtnRef"
                 class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center"
+                @click="toggleUrlPop"
             >
               <Icon name="app-icons:link" class="w-6 h-6" />
             </button>
@@ -34,11 +36,19 @@
             </div>
         </div>
         <PinsAppCreateDrawer ref="pinsCreateDrawerRef" @pin-created="handlePinCreated" />
+        <PinsAppCreateUrlPinPop
+          :is-open="isUrlPopOpen"
+          :reference-el="urlBtnRef"
+          @close="isUrlPopOpen = false"
+          @pin-created="handlePinCreated" 
+        />
     </div>
 </template>
 <script setup lang="js">
 import { useFlowbite } from '~/composables/useFlowbite';
 
+const isUrlPopOpen = ref(false)
+const urlBtnRef = ref(null)
 const pinsCreateDrawerRef = ref(null)
 
 onMounted(() => {
@@ -86,7 +96,7 @@ const handlePinCreated = (newPin) => {
   emit('pinCreated', newPin)
 }
 
-const openPinsCreateDrawer = () => {
-  pinsCreateDrawerRef.value?.openModal()
+const toggleUrlPop = () => {
+  isUrlPopOpen.value = !isUrlPopOpen.value
 }
 </script>
