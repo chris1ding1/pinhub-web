@@ -44,7 +44,7 @@
         />
     </div>
 </template>
-<script setup lang="js">
+<script setup lang="ts">
 import { useFlowbite } from '~/composables/useFlowbite';
 
 const isUrlPopOpen = ref(false)
