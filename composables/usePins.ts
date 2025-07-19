@@ -90,6 +90,11 @@ export const ValidatorPinUrlSchema =  v.pipe(
   v.maxLength(2048, 'URL must be less than 2048 characters'),
 )
 
+export const ValidatorPinContentSchema =  v.pipe(
+  v.string(),
+  v.maxLength(3000, 'Content must be less than 3000 characters'),
+)
+
 export const ValidatorPinFormSchema = v.pipe(
     v.object({
       url: v.optional(
@@ -147,6 +152,21 @@ export const createUrlPin = async (url: string): Promise<ApiResponse<PinResponse
           method: 'POST',
           body: {
             url: url
+          },
+      })
+      return response
+  } catch (error) {
+      console.log(error)
+      return false
+  }
+}
+
+export const createContentPin = async (content: string): Promise<ApiResponse<PinResponse> | false> => {
+  try {
+      const response = await useNuxtApp().$api<ApiResponse<PinResponse>>('/pins', {
+          method: 'POST',
+          body: {
+            content: content
           },
       })
       return response
