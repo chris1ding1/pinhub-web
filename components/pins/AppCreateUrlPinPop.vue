@@ -54,11 +54,16 @@ const inputRef = ref<HTMLInputElement | null>(null)
 
 const referenceEl = computed(() => props.referenceEl || undefined)
 
-const { floatingStyles, placement, update } = useFloating(
+const { floatingStyles, update } = useFloating(
   referenceEl,
   floatingEl,
   {
-    middleware: [offset(10), flip(), shift()],
+    placement: 'top',
+    middleware: [
+      offset(10),
+      flip(),
+      shift()
+    ],
     whileElementsMounted: autoUpdate,
     strategy: 'fixed'
   }
