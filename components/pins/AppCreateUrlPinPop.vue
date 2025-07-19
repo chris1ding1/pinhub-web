@@ -22,8 +22,8 @@
               <button
                 type="button"
                 :class="[
-                  'text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2',
-                  isCreateLonding ? 'cursor-progress' : 'cursor-pointer'
+                  'text-white absolute end-2.5 bottom-2.5 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2',
+                  isCreateLonding ? 'cursor-progress bg-blue-400' : 'cursor-pointer bg-blue-700 hover:bg-blue-800'
                 ]"
                 :disabled="isCreateLonding"
                 @click="handleCreateUrlPin"
@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import * as v from 'valibot';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue'
 
 const props = defineProps<{
@@ -81,20 +82,35 @@ const handleCreateUrlPin = async () => {
     return
   }
 
+  try {
+    v.parse(ValidatorPinUrlSchema, url.value)
+  } catch (error) {
+    console.log('Create url pin verify error: ', error)
+
+    if (error instanceof v.ValiError) {
+      const flatErrors = v.flatten(error.issues)
+      console.log('Create url pin verify error: ', flatErrors)
+    }
+
+    return
+  }
+
   isCreateLonding.value = true
   try {
-    /*
-    const response = await creatUrlPin(url.value)
-    if (response && response.code === 0 && response.data) {
-      emit('pin-created', response.data)
+    const response = await createUrlPin(url.value)
+
+    if (!response || response.code !== 0 || !response.data) {
+      return
     }
-      */
-      url.value = ''
-      emit('close')
-      isCreateLonding.value = false
+    
+    emit('pin-created', response.data)
+    url.value = ''
+    emit('close')
+    
   } catch (error) {
-    isCreateLonding.value = false
     console.error('Error creating URL pin:', error)
+  } finally {
+    isCreateLonding.value = false
   }
 }
 </script>
