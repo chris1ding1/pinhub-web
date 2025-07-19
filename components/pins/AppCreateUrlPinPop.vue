@@ -4,26 +4,25 @@
     v-show="isOpen"
     ref="floatingEl"
     :style="floatingStyles"
-    class="z-20 p-4 rounded-xl w-64"
+    class="z-20 p-4"
   >
-        <form class="w-full">
-          <div class="flex flex-col space-y-2">
+        <form method="post">
             <label for="url" class="sr-only">Link</label>
-            <input 
-              id="url" 
-              ref="inputRef"
-              v-model="url"
-              type="url" 
-              placeholder="Enter Link" 
-              class="w-full text-sm rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
-              required
-              maxlength="2048"
-            >
-            <div class="flex justify-end">
+            <div class="relative">
+              <input
+                id="url" 
+                ref="inputRef"
+                v-model="url"
+                type="url" 
+                placeholder="Enter Link"
+                class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
+                required
+                maxlength="2048"
+              >
               <button
-                type="button" 
+                type="button"
                 :class="[
-                  'inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                  'text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2',
                   isCreateLonding ? 'cursor-progress' : 'cursor-pointer'
                 ]"
                 :disabled="isCreateLonding"
@@ -32,7 +31,6 @@
                 {{ isCreateLonding ? 'Create...' : 'Create' }}
               </button>
             </div>
-          </div>
         </form>
   </div>
   </Teleport>
