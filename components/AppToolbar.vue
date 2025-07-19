@@ -29,7 +29,9 @@
               <Icon name="app-icons:link" />
             </button>
             <button
-                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1"
+              ref="textBtnRef"
+              class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1"
+              @click="toggleTextPop"
             >
               <Icon name="app-icons:document-text" />
             </button>
@@ -46,6 +48,12 @@
           @close="isUrlPopOpen = false"
           @pin-created="handlePinCreated" 
         />
+        <PinsAppCreateTextPinPop
+          :is-open="isTextPopOpen"
+          :reference-el="textBtnRef"
+          @close="isTextPopOpen = false"
+          @pin-created="handlePinCreated" 
+        />
     </div>
 </template>
 <script setup lang="ts">
@@ -54,6 +62,10 @@ import { initTooltips } from 'flowbite';
 
 const isUrlPopOpen = ref(false)
 const urlBtnRef = ref(null)
+
+const isTextPopOpen = ref(false)
+const textBtnRef = ref(null)
+
 const pinsCreateDrawerRef = ref(null)
 
 onMounted(() => {
@@ -110,5 +122,9 @@ const openPinsCreateDrawer = () => {
 
 const toggleUrlPop = () => {
   isUrlPopOpen.value = !isUrlPopOpen.value
+}
+
+const toggleTextPop = () => {
+  isTextPopOpen.value = !isTextPopOpen.value
 }
 </script>
