@@ -44,7 +44,7 @@ import { onClickOutside, onKeyStroke } from '@vueuse/core'
 
 const props = defineProps<{
   isOpen: boolean
-  referenceEl: null
+  referenceEl: HTMLElement | null
 }>()
 
 const emit = defineEmits(['pin-created', 'close'])
@@ -71,8 +71,10 @@ const { floatingStyles, update } = useFloating(
   }
 )
 
-onClickOutside(floatingEl, () => {
-  if (props.isOpen) {
+onClickOutside(floatingEl, (event) => {
+  const target = event.target as Node;
+
+  if (props.isOpen && referenceEl.value && !referenceEl.value.contains(target)) {
     emit('close')
   }
 })
