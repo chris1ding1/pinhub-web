@@ -18,6 +18,7 @@
                 class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
                 required
                 maxlength="2048"
+                @keydown.esc="handleEsc"
               >
               <button
                 type="button"
@@ -39,6 +40,7 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue'
+import { onClickOutside, onKeyStroke } from '@vueuse/core'
 
 const props = defineProps<{
   isOpen: boolean
@@ -68,6 +70,24 @@ const { floatingStyles, update } = useFloating(
     strategy: 'fixed'
   }
 )
+
+onClickOutside(floatingEl, () => {
+  if (props.isOpen) {
+    emit('close')
+  }
+})
+
+// Handle ESC key
+const handleEsc = () => {
+  emit('close')
+}
+
+// Also listen for ESC globally when component is open
+onKeyStroke('Escape', () => {
+  if (props.isOpen) {
+    emit('close')
+  }
+})
 
 watch(
   () => props.isOpen,
