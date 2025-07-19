@@ -1,13 +1,12 @@
 <template>
-    <div class="mx-auto max-w-7xl p-3 rounded-2xl bg-white/50 shadow-md left-1/2 fixed bottom-10 justify-center items-center z-20 backdrop-blur-md">
-        <div class="flex items-center space-x-1">
+    <div class="fixed transform -translate-x-1/2 left-1/2 bottom-10 z-20">
+        <div class="flex justify-center items-center p-3 rounded-2xl bg-white/50 shadow-md backdrop-blur-md space-x-1">
             <button
                 @click="triggerImage"
-                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center" data-tooltip-target="tooltip-image">
-                <Icon
-                    class="w-8 h-8"
-                    name="app-icons:catppuccin-image"
-                />
+                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1"
+                data-tooltip-target="tooltip-image"
+            >
+                <Icon name="app-icons:catppuccin-image" />
                 <input
                     ref="imageInput"
                     type="file"
@@ -17,17 +16,17 @@
                 >
             </button>
             <button
-                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center"
+                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1"
                 @click="openPinsCreateDrawer"
             >
-              <Icon name="app-icons:plus" class="w-6 h-6" />
+              <Icon name="app-icons:plus" />
             </button>
             <button
                 ref="urlBtnRef"
-                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1 flex justify-center items-center"
+                class="w-8 h-8 rounded-lg hover:bg-gray-100 p-1"
                 @click="toggleUrlPop"
             >
-              <Icon name="app-icons:link" class="w-6 h-6" />
+              <Icon name="app-icons:link" />
             </button>
         </div>
         <div>
