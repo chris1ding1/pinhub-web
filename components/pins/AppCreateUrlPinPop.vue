@@ -15,7 +15,7 @@
                 v-model="url"
                 type="url"
                 placeholder="Enter Link"
-                class="block w-full p-4 text-sm text-gray-900 border rounded-lg bg-white/50 shadow-md backdrop-blur-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
+                class="block w-full p-4 text-sm text-gray-900 border rounded-lg bg-white/50 shadow-md backdrop-blur-md focus:ring-blue-500 focus:border-blue-500" 
                 required
                 maxlength="2048"
                 @keydown.esc="handleEsc"
