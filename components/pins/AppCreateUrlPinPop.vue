@@ -4,18 +4,18 @@
     v-show="isOpen"
     ref="floatingEl"
     :style="floatingStyles"
-    class="z-20 p-4"
+    class="z-20 p-4 w-full max-w-sm"
   >
-        <form method="post">
+        <form method="post" class="mx-auto w-full max-w-md">
             <label for="url" class="sr-only">Link</label>
             <div class="relative">
               <input
-                id="url" 
+                id="url"
                 ref="inputRef"
                 v-model="url"
-                type="url" 
+                type="url"
                 placeholder="Enter Link"
-                class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
+                class="block w-full p-4 text-sm text-gray-900 border rounded-lg bg-white/50 shadow-md backdrop-blur-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
                 required
                 maxlength="2048"
                 @keydown.esc="handleEsc"
